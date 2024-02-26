@@ -1,13 +1,11 @@
-"use client"
-
-// import {LinearProgress, Modal} from "@mui/material";
 import React, {useState} from "react";
-import StepLineChart from "@/components/StepLineChart";
-import {IoAdd, IoClose} from "react-icons/io5";
-import {FaFlag} from "react-icons/fa6";
-import {MdOutlineAttachMoney} from "react-icons/md";
-import Modal from "@/components/common/Modal";
-import ProgressBar from "@/components/ProgressBar";
+import CreateGoalModal from "@/components/common/modals/CreateGoalModal";
+import AddSavingsTransactionModal from "@/components/common/modals/AddSavingsTransactionModal";
+import Header from "@/components/Header";
+import SavingsChart from "@/components/common/SavingsChart";
+import DisplayGoals from "@/components/DisplayGoals";
+import CreateButtonsPane from "@/components/CreateButtonsPane";
+
 
 /**
  * this will be the home page of the application - "Saved Instead"
@@ -55,20 +53,7 @@ export default function Home() {
     const [data, setData] = useState([10, 20, 15, 30, 40, 35]); // Example data array
     const [showAddButtons, setShowAddButtons] = useState(false);
 
-    const openCreateGoalModal = () => {
-        setIsCreateGoalModalOpen(true);
-        setShowAddButtons(false);
-    }
-    const openAddSavingsModal = () => {
-        setIsAddSavingsModalOpen(true);
-        setShowAddButtons(false);
-    }
-
-    const openAddButtonsPane = () => {
-        setShowAddButtons(!showAddButtons);
-    }
-
-    const addSavingsGoal = (name: string, amount: string, imageUrl: string) => {
+    const addSavingsGoal = (name: string, amount: number, imageUrl: string) => {
         const newGoals = [...savingsGoals, {imageUrl, name, amountTarget: amount, amountSaved: 0}];
         setSavingsGoals(newGoals);
         setIsCreateGoalModalOpen(false);
@@ -84,6 +69,15 @@ export default function Home() {
         let newData = generateData(view);
         setData(newData);
         setSelectedView(view);
+    }
+
+    const openModal = (modalType: string) => {
+        if (modalType === 'goal') {
+            setIsCreateGoalModalOpen(true);
+        } else if (modalType === 'transaction') {
+            setIsAddSavingsModalOpen(true);
+        }
+        setShowAddButtons(false);
     }
 
     const generateData = (view: string) => {
@@ -104,185 +98,22 @@ export default function Home() {
                 2050, 2300, 2550, 2800,
                 3050];
         }
+        return []
     }
-
-    const handleCloseCreateGoalModal = () => setIsCreateGoalModalOpen(false);
-    const handleCloseAddSavingsModal = () => setIsAddSavingsModalOpen(false);
 
     return (
         <main className="flex flex-col items-center bg-gray-100 h-screen relative">
-            {/*<h1>Saved Instead</h1>*/}
-            <div className={"bg-blue-600 w-11/12 mt-4 rounded-xl p-4"}>
-                <p className={"text-gray-300"}>Total Amount Saved</p>
-                <p className={"text-white text-2xl"}>${totalSaved}</p>
-            </div>
+            <Header totalSaved={totalSaved}/>
+            <SavingsChart data={data} selectedView={selectedView} changeChartView={changeChartView}/>
+            <DisplayGoals savingsGoals={savingsGoals}/>
 
-            <div className={"w-11/12 mt-4"}>
-                <StepLineChart data={data} view={selectedView}/>
-                <div className={"flex w-full my-2"}>
-                    <button
-                        className={`${selectedView === "week" ? "text-white bg-blue-600" : "bg-gray-300"} w-full p-2 m-1 rounded-lg`}
-                        onClick={() => changeChartView('week')}>Week
-                    </button>
-                    <button
-                        className={`${selectedView === "month" ? "text-white bg-blue-600" : "bg-gray-300"} w-full p-2 m-1 rounded-lg`}
-                        onClick={() => changeChartView('month')}>Month
-                    </button>
-                    <button
-                        className={`${selectedView === "year" ? "text-white bg-blue-600" : "bg-gray-300"} w-full p-2 m-1 rounded-lg`}
-                        onClick={() => changeChartView('year')}>Year
-                    </button>
-                </div>
-            </div>
-
-            <ul className={"flex flex-col w-full items-center"}>
-                <div className={"w-11/12 flex justify-between mb-2"}>
-                    <h2>Your goals:</h2>
-                    <div className={"space-x-4"}>
-                        <button className={"border-b-blue-600 border-b-2"}>All</button>
-                        <button className={"text-gray-500"}>Achieved</button>
-                    </div>
-                </div>
-                <div className={"flex w-full justify-around"}>
-                    {savingsGoals.map((goal) => (
-                        <li key={goal.name} className={"w-1/3 p-4 bg-white rounded-xl"}>
-                            <img src={goal.imageUrl} alt={goal.name} width={100} height={100}/>
-                            <p>{goal.name}</p>
-                            <div className={"my-2 overflow-hidden"}>
-                                <ProgressBar currentSaved={goal.amountSaved} totalRequired={goal.amountTarget}/>
-                                {/*<LinearProgress variant="determinate"*/}
-                                {/*                value={goal.amountSaved / goal.amountTarget * 100}/>*/}
-                            </div>
-                            <div className={"flex justify-between"}>
-                                <p>${goal.amountSaved}</p>
-                                <p>${goal.amountTarget}</p>
-                            </div>
-                        </li>
-                    ))}
-                </div>
-            </ul>
-
-            <button className={"bg-blue-600 rounded-full p-2 absolute bottom-4 right-4"}>
-                {showAddButtons ?
-                    <IoClose onClick={openAddButtonsPane} className={"text-white text-4xl "}/> :
-                    <IoAdd onClick={openAddButtonsPane} className={"text-white text-4xl "}/>
-                }
-            </button>
-            {showAddButtons && (
-                <>
-                    <div className={"absolute right-5 bottom-20 flex items-center space-x-2"}>
-                        <p>Create Goal</p>
-                        <button className={"bg-white rounded-full p-2"}
-                                onClick={openCreateGoalModal}>
-                            <FaFlag className={"text-blue-600 text-2xl "}/>
-                        </button>
-                    </div>
-                    <div className={"absolute right-5 bottom-32 flex items-center space-x-2"}>
-                        <p>Add Savings</p>
-                        <button className={"bg-white rounded-full p-2"}
-                                onClick={openAddSavingsModal}>
-                            <MdOutlineAttachMoney className={"text-blue-600 text-2xl "}/>
-                        </button>
-                    </div>
-                </>
-            )}
-
+            <CreateButtonsPane showAddButtons={showAddButtons} setShowAddButtons={setShowAddButtons} openModal={openModal}/>
             <CreateGoalModal createSavingsGoal={addSavingsGoal} isCreateGoalModalOpen={isCreateGoalModalOpen}
                              setIsCreateGoalModalOpen={setIsCreateGoalModalOpen}/>
-            <AddTransactionModal addSavingsTransaction={addSavingsTransaction}
-                                 isAddTransactionModalOpen={isAddSavingsModalOpen}
-                                 setIsAddTransactionModalOpen={setIsAddSavingsModalOpen}
-                                 savingsGoals={savingsGoals}/>
+            <AddSavingsTransactionModal addSavingsTransaction={addSavingsTransaction}
+                                        isAddTransactionModalOpen={isAddSavingsModalOpen}
+                                        setIsAddTransactionModalOpen={setIsAddSavingsModalOpen}
+                                        savingsGoals={savingsGoals}/>
         </main>
     );
-}
-
-const CreateGoalModal = ({isCreateGoalModalOpen, setIsCreateGoalModalOpen, handleClose, createSavingsGoal}: any) => {
-    const [name, setName] = useState("");
-    const [amount, setAmount] = useState(0);
-    const [imageUrl, setImageUrl] = useState("");
-
-    return (
-        <Modal isModalOpen={isCreateGoalModalOpen} setIsModalOpen={setIsCreateGoalModalOpen}>
-            <div className={"bg-white rounded-lg"}>
-                <h2 className={"text-center text-xl font-bold mb-4"}>Create a new Savings Goal</h2>
-                <div className={"space-y-4"}>
-                    <div className={"flex flex-col"}>
-                        <label htmlFor="name">
-                            Name
-                        </label>
-                        <input className={"border-2 p-2 rounded-md"} type="number" id="amount" name="amount"
-                               value={amount} onChange={(e) => setName(e.target.value)}/>
-                    </div>
-                    <div className={"flex flex-col"}>
-                        <label htmlFor="amount">
-                            Amount
-                        </label>
-                        <input className={"border-2 p-2 rounded-md"} type="number" id="amount" name="amount"
-                               value={amount} onChange={(e) => setAmount(e.target.value)}/>
-                    </div>
-                    <div className={"flex flex-col"}>
-                        <label htmlFor={"image"}>
-                            Image url
-                        </label>
-                        <input className={"border-2 p-2 rounded-md"} type="text" id="image" name="image"
-                               onChange={(e) => setImageUrl(e.target.value)}/>
-
-                    </div>
-                    <button className={"bg-blue-600 w-full rounded-full p-2 text-white"}
-                            onClick={() => createSavingsGoal(name, amount, imageUrl)} type="submit">Create
-                    </button>
-                </div>
-            </div>
-        </Modal>
-    )
-}
-
-const AddTransactionModal = ({
-                                 isAddTransactionModalOpen,
-                                 setIsAddTransactionModalOpen,
-                                 addSavingsTransaction,
-                                 savingsGoals
-                             }: any) => {
-    const [amount, setAmount] = useState(0);
-    const [priorityGoal, setPriorityGoal] = useState("");
-    const [percentage, setPercentage] = useState(0);
-
-    return (
-        <Modal isModalOpen={isAddTransactionModalOpen} setIsModalOpen={setIsAddTransactionModalOpen}>
-            <h2 className={"text-center text-xl font-bold my-4"}>Add Savings</h2>
-            <div className={"space-y-4"}>
-                <div className={"flex flex-col"}>
-                    <label htmlFor="amount">
-                        Amount
-                    </label>
-                    <input className={"border-2 p-2 rounded-md"} type="number" id="amount" name="amount"
-                           value={amount} onChange={(e) => setAmount(e.target.value)}/>
-                </div>
-                <div className={"flex flex-col"}>
-                    <label htmlFor="goal">
-                        Priority Goal
-                    </label>
-                    <select className={"border-2 p-2 rounded-md"} name="goal" id="goal" value={priorityGoal}
-                            onChange={(e) => setPriorityGoal(e.target.value)}>
-                        <option value={"none"}>None</option>
-                        {savingsGoals.map((goal: any) => (
-                            <option value={goal.name}>{goal.name}</option>
-                        ))}
-                    </select>
-                </div>
-                <div className={"flex flex-col"}>
-                    <label htmlFor="percentage">
-                        Percentage
-                    </label>
-                    <input className={"border-2 p-2 rounded-md"} type="number" id="percentage"
-                           name="percentage" value={percentage} onChange={(e) => setPercentage(e.target.value)}/>
-                </div>
-                <button className={"bg-blue-600 w-full rounded-full p-2 text-white"}
-                        onClick={() => addSavingsTransaction(amount, priorityGoal, percentage)} type="submit">
-                    Add
-                </button>
-            </div>
-        </Modal>
-    )
 }
