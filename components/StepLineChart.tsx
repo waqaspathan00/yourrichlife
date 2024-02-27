@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
-import {Line} from 'react-chartjs-2';
 import 'chart.js/auto';
+import {Line} from 'react-chartjs-2';
 
 const StepLineChart = ({data, view}: any) => {
 
@@ -75,7 +75,8 @@ const StepLineChart = ({data, view}: any) => {
         backgroundColor: '#3B66FF', // Example background color
         elements: {
             line: {
-                tension: 0 // Adds some curve to the line
+                tension: 0.5, // Adds some curve to the line
+                // display: true
             },
             point: {
                 radius: 0.5 // Removes points from the line

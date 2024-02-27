@@ -35,7 +35,7 @@ export default function CreateButtonsPane({showAddButtons, setShowAddButtons, op
                     <div className={"absolute right-5 bottom-32 flex items-center space-x-2"}>
                         <p>Add Savings</p>
                         <button className={"bg-white rounded-full p-2"}
-                                onClick={() => openModal("goal")}>
+                                onClick={() => openModal("savings")}>
                             <MdOutlineAttachMoney className={"text-blue-600 text-2xl "}/>
                         </button>
                     </div>

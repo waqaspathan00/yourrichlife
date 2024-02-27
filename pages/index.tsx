@@ -1,10 +1,12 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import CreateGoalModal from "@/components/common/modals/CreateGoalModal";
 import AddSavingsTransactionModal from "@/components/common/modals/AddSavingsTransactionModal";
 import Header from "@/components/Header";
 import SavingsChart from "@/components/common/SavingsChart";
 import DisplayGoals from "@/components/DisplayGoals";
 import CreateButtonsPane from "@/components/CreateButtonsPane";
+import {db} from "@/lib/firebase";
+import {doc, getDoc, updateDoc} from "@firebase/firestore";
 
 
 /**
@@ -22,9 +24,12 @@ import CreateButtonsPane from "@/components/CreateButtonsPane";
  *  During this process, the user can identify a goal to prioritize and what percentage of the transaction should go to that goal
  *
  * for next time:
- * - when user creates a goal, save it to local storage
- * - when user inputs savings, distribute the amount to the goals based on the percentage
- * - also track user savings in the chart
+ * - there are dupe savings goals being created right now when adding a new transaction
+ * - add an id to each goal to track it
+ * - move firebase calls into a separate file
+ * - add a view button to goals to see more details about the goal and to edit and delete it
+ * - add horizontal spacing to goals
+ * - add proper savings tracking over time logic
  *
  *
  * @constructor
@@ -34,33 +39,90 @@ export default function Home() {
     const [isAddSavingsModalOpen, setIsAddSavingsModalOpen] = useState(false);
     const [savingsGoals, setSavingsGoals] = useState(
         [
-            {
-                "imageUrl": "https://pictures.dealer.com/generic--OEM_VIN_STOCK_PHOTOS/8184fecc2b4e3f725c098692df721e13.jpg?impolicy=downsize_bkpt&imdensity=1&w=520",
-                "name": "Subaru Outback",
-                "amountTarget": 1000,
-                "amountSaved": 500
-            },
-            {
-                "imageUrl": "https://i.ebayimg.com/images/g/ExIAAOSwIyxhpCpv/s-l1200.webp",
-                "name": "Wedding Suit",
-                "amountTarget": 200,
-                "amountSaved": 0
-            }
+            // {
+            //     "imageUrl": "https://pictures.dealer.com/generic--OEM_VIN_STOCK_PHOTOS/8184fecc2b4e3f725c098692df721e13.jpg?impolicy=downsize_bkpt&imdensity=1&w=520",
+            //     "name": "Subaru Outback",
+            //     "amountTarget": 1000,
+            //     "amountSaved": 500
+            // },
+            // {
+            //     "imageUrl": "https://i.ebayimg.com/images/g/ExIAAOSwIyxhpCpv/s-l1200.webp",
+            //     "name": "Wedding Suit",
+            //     "amountTarget": 200,
+            //     "amountSaved": 0
+            // }
         ]
     );
-    const [totalSaved, setTotalSaved] = useState(500);
+    const [totalSaved, setTotalSaved] = useState(0);
     const [selectedView, setSelectedView] = useState('week'); // Default view
     const [data, setData] = useState([10, 20, 15, 30, 40, 35]); // Example data array
     const [showAddButtons, setShowAddButtons] = useState(false);
 
+    useEffect(() => {
+        // fetch existing data from firestore db under collection "savings" and document "wadia"
+        const fetchData = async () => {
+            const savingsDocRef = doc(db, "savings", "wadia");
+            const savingsDoc = await getDoc(savingsDocRef);
+            const savingsData = savingsDoc.data();
+            setTotalSaved(savingsData?.totalSaved ? savingsData.totalSaved : 0);
+            setSavingsGoals(savingsData?.savingsGoals ? savingsData.savingsGoals : []);
+        }
+        fetchData();
+    })
+
     const addSavingsGoal = (name: string, amount: number, imageUrl: string) => {
-        const newGoals = [...savingsGoals, {imageUrl, name, amountTarget: amount, amountSaved: 0}];
+        const newGoal = {imageUrl, name, amountTarget: amount, amountSaved: 0};
+        const newGoals = [...savingsGoals, newGoal];
+
+        try {
+            const savingsDocRef = doc(db, "savings", "wadia");
+            updateDoc(savingsDocRef, {
+                savingsGoals: newGoals
+            });
+        } catch (err) {
+            console.log(err);
+            throw new Error("Error saving data to DB");
+        }
+
+        // @ts-ignore
         setSavingsGoals(newGoals);
         setIsCreateGoalModalOpen(false);
     }
 
-    const addSavingsTransaction = (amount: string, priorityGoal: string, percentage: string) => {
+    const addSavingsTransaction = async (amount: string, priorityGoal: string, percentage: string) => {
         const newTotalSaved = totalSaved + parseInt(amount);
+        // contribute percentage amount to priority goal
+        // distribute the rest of the amount to the other goals
+        const newGoals = savingsGoals.map((goal: any) => {
+            if (goal.name === priorityGoal) {
+                return {
+                    ...goal,
+                    amountSaved: goal.amountSaved + (parseInt(amount) * (parseInt(percentage) / 100))
+                }
+            }
+            return goal;
+        })
+        const remainingAmount = parseInt(amount) - (parseInt(amount) * (parseInt(percentage) / 100));
+        const nonPriorityGoals = newGoals.filter((goal: any) => goal.name !== priorityGoal);
+        const numNonPriorityGoals = nonPriorityGoals.length;
+        const amountPerGoal = remainingAmount / numNonPriorityGoals;
+        const updatedNonPriorityGoals = nonPriorityGoals.map((goal: any) => {
+            return {
+                ...goal,
+                amountSaved: goal.amountSaved + amountPerGoal
+            }
+        });
+
+        try {
+            const savingsDocRef = doc(db, "savings", "wadia");
+            await updateDoc(savingsDocRef, {
+                totalSaved: newTotalSaved,
+                savingsGoals: [...newGoals, ...updatedNonPriorityGoals]
+            });
+        } catch (err) {
+            console.log(err);
+            throw new Error("Error saving data to DB");
+        }
         setTotalSaved(newTotalSaved);
         setIsAddSavingsModalOpen(false);
     };
@@ -74,7 +136,7 @@ export default function Home() {
     const openModal = (modalType: string) => {
         if (modalType === 'goal') {
             setIsCreateGoalModalOpen(true);
-        } else if (modalType === 'transaction') {
+        } else if (modalType === 'savings') {
             setIsAddSavingsModalOpen(true);
         }
         setShowAddButtons(false);
@@ -107,7 +169,8 @@ export default function Home() {
             <SavingsChart data={data} selectedView={selectedView} changeChartView={changeChartView}/>
             <DisplayGoals savingsGoals={savingsGoals}/>
 
-            <CreateButtonsPane showAddButtons={showAddButtons} setShowAddButtons={setShowAddButtons} openModal={openModal}/>
+            <CreateButtonsPane showAddButtons={showAddButtons} setShowAddButtons={setShowAddButtons}
+                               openModal={openModal}/>
             <CreateGoalModal createSavingsGoal={addSavingsGoal} isCreateGoalModalOpen={isCreateGoalModalOpen}
                              setIsCreateGoalModalOpen={setIsCreateGoalModalOpen}/>
             <AddSavingsTransactionModal addSavingsTransaction={addSavingsTransaction}

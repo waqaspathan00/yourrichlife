@@ -15,8 +15,8 @@ export default function CreateGoalModal({isCreateGoalModalOpen, setIsCreateGoalM
                         <label htmlFor="name">
                             Name
                         </label>
-                        <input className={"border-2 p-2 rounded-md"} type="number" id="amount" name="amount"
-                               value={amount} onChange={(e) => setName(e.target.value)}/>
+                        <input className={"border-2 p-2 rounded-md"} type="text" id="name" name="name"
+                               value={name} onChange={(e) => setName(e.target.value)}/>
                     </div>
                     <div className={"flex flex-col"}>
                         <label htmlFor="amount">
