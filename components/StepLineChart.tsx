@@ -7,10 +7,10 @@ const StepLineChart = ({data, view}: any) => {
     // Generate labels based on the current view
     let labels;
     switch (view) {
-        case 'week':
+        case '1M':
             labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
             break;
-        case 'month':
+        case '3M':
             const month = new Date().getMonth();
             let days;
             if (month === 1) {
@@ -22,7 +22,7 @@ const StepLineChart = ({data, view}: any) => {
             }
             labels = Array.from({length: days}, (_, i) => i);
             break;
-        case 'year':
+        case '1Y':
             labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             break;
         default:
@@ -38,8 +38,9 @@ const StepLineChart = ({data, view}: any) => {
                 data: data,
                 borderColor: '#3B66FF',
                 borderWidth: 2,
-                fill: false,
+                fill: true,
                 stepped: true,
+                // stepped: false,
             },
         ],
     };
@@ -49,18 +50,15 @@ const StepLineChart = ({data, view}: any) => {
         scales: {
             y: {
                 beginAtZero: true,
-            },
-            x: {
-                grid: {
-                    drawOnChartArea: true, // Draw the grid lines on the chart area
-                    color: function (context: any) {
-                        if (context.tick && context.tick.major) {
-                            return '#f00'; // Example to change grid line color, not necessary for background
-                        } else {
-                            return '#eaeaea'; // Example to change grid line color, not necessary for background
-                        }
+                ticks: {
+                    // Include a dollar sign in the ticks
+                    callback: function(value: number) {
+                        return '$' + value.toString();
                     }
                 }
+            },
+            x: {
+                display: false
             }
         },
         plugins: {
@@ -69,17 +67,24 @@ const StepLineChart = ({data, view}: any) => {
             },
             title: {
                 display: false,
-            },
+            }
         },
         // Set the background color
-        backgroundColor: '#3B66FF', // Example background color
+        // backgroundColor: 'black', // Example background color,
+        backgroundColor: ({chart}: any) => {
+            const bg = chart.ctx.createLinearGradient(0, 0, 0, 140);
+            // More config for your gradient
+            bg.addColorStop(0, "#3B66FF");
+            bg.addColorStop(1, "white");
+            return bg;
+        },
         elements: {
             line: {
                 tension: 0.5, // Adds some curve to the line
                 // display: true
             },
             point: {
-                radius: 0.5 // Removes points from the line
+                radius: 1 // Removes points from the line
             }
         },
         maintainAspectRatio: false, // Add this to control aspect ratio
@@ -87,6 +92,7 @@ const StepLineChart = ({data, view}: any) => {
 
     return (
         <div className="p-4 bg-white shadow-lg rounded-lg">
+            {/* @ts-ignore */}
             <Line data={chartData} options={options}/>
         </div>
     );

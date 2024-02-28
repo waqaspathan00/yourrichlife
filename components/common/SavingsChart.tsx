@@ -10,18 +10,18 @@ export default function SavingsChart({data, selectedView, changeChartView}: Savi
     return (
         <div className={"w-11/12 mt-4"}>
             <StepLineChart data={data} view={selectedView}/>
-            <div className={"flex w-full my-2"}>
+            <div className={"flex w-full my-2 bg-white rounded-lg"}>
                 <button
-                    className={`${selectedView === "week" ? "text-white bg-blue-600" : "bg-gray-300"} w-full p-2 m-1 rounded-lg`}
-                    onClick={() => changeChartView('week')}>Week
+                    className={`${selectedView === "1M" ? "text-white bg-blue-600" : "text-gray-400"} font-bold transition-all w-full p-2 m-1 rounded-full`}
+                    onClick={() => changeChartView('1M')}>1M
                 </button>
                 <button
-                    className={`${selectedView === "month" ? "text-white bg-blue-600" : "bg-gray-300"} w-full p-2 m-1 rounded-lg`}
-                    onClick={() => changeChartView('month')}>Month
+                    className={`${selectedView === "3M" ? "text-white bg-blue-600" : "text-gray-400"} font-bold transition-all w-full p-2 m-1 rounded-full`}
+                    onClick={() => changeChartView('3M')}>3M
                 </button>
                 <button
-                    className={`${selectedView === "year" ? "text-white bg-blue-600" : "bg-gray-300"} w-full p-2 m-1 rounded-lg`}
-                    onClick={() => changeChartView('year')}>Year
+                    className={`${selectedView === "1Y" ? "text-white bg-blue-600" : "text-gray-400"} font-bold transition-all w-full p-2 m-1 rounded-full`}
+                    onClick={() => changeChartView('1Y')}>1Y
                 </button>
             </div>
         </div>

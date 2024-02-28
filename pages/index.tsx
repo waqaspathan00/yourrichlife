@@ -24,8 +24,6 @@ import {doc, getDoc, updateDoc} from "@firebase/firestore";
  *  During this process, the user can identify a goal to prioritize and what percentage of the transaction should go to that goal
  *
  * for next time:
- * - there are dupe savings goals being created right now when adding a new transaction
- * - add an id to each goal to track it
  * - move firebase calls into a separate file
  * - add a view button to goals to see more details about the goal and to edit and delete it
  * - add horizontal spacing to goals
@@ -54,8 +52,13 @@ export default function Home() {
         ]
     );
     const [totalSaved, setTotalSaved] = useState(0);
-    const [selectedView, setSelectedView] = useState('week'); // Default view
-    const [data, setData] = useState([10, 20, 15, 30, 40, 35]); // Example data array
+    const [selectedView, setSelectedView] = useState('3M'); // Default view
+    const [data, setData] = useState(
+        [1000, 1020, 1040, 1060, 1090, 1070,
+            1110, 1150, 1170, 1200, 1230, 1210,
+            1260, 1300, 1330, 1360, 1400, 1380,
+            1430, 1460, 1500, 1530, 1570, 1600,
+            1640, 1670, 1710, 1750, 1730, 1780]); // Example data array
     const [showAddButtons, setShowAddButtons] = useState(false);
 
     useEffect(() => {
@@ -68,10 +71,16 @@ export default function Home() {
             setSavingsGoals(savingsData?.savingsGoals ? savingsData.savingsGoals : []);
         }
         fetchData();
-    })
+    }, [])
+
+    const generateId = () => {
+        return Math.floor(Math.random() * 1000000);
+    }
 
     const addSavingsGoal = (name: string, amount: number, imageUrl: string) => {
-        const newGoal = {imageUrl, name, amountTarget: amount, amountSaved: 0};
+        const newGoal = {
+            id: generateId(), imageUrl, name, amountTarget: amount, amountSaved: 0
+        };
         const newGoals = [...savingsGoals, newGoal];
 
         try {
@@ -91,25 +100,18 @@ export default function Home() {
 
     const addSavingsTransaction = async (amount: string, priorityGoal: string, percentage: string) => {
         const newTotalSaved = totalSaved + parseInt(amount);
-        // contribute percentage amount to priority goal
-        // distribute the rest of the amount to the other goals
-        const newGoals = savingsGoals.map((goal: any) => {
-            if (goal.name === priorityGoal) {
-                return {
-                    ...goal,
-                    amountSaved: goal.amountSaved + (parseInt(amount) * (parseInt(percentage) / 100))
-                }
-            }
-            return goal;
-        })
-        const remainingAmount = parseInt(amount) - (parseInt(amount) * (parseInt(percentage) / 100));
-        const nonPriorityGoals = newGoals.filter((goal: any) => goal.name !== priorityGoal);
-        const numNonPriorityGoals = nonPriorityGoals.length;
+        const totalAmount = parseInt(amount);
+        const priorityPercentage = parseInt(percentage) / 100;
+        const priorityAmount = totalAmount * priorityPercentage;
+        const remainingAmount = totalAmount - priorityAmount;
+
+        const numNonPriorityGoals = savingsGoals.filter((goal: any) => goal.name !== priorityGoal).length;
         const amountPerGoal = remainingAmount / numNonPriorityGoals;
-        const updatedNonPriorityGoals = nonPriorityGoals.map((goal: any) => {
-            return {
-                ...goal,
-                amountSaved: goal.amountSaved + amountPerGoal
+        const updatedSavingsGoals = savingsGoals.map((goal: any) => {
+            if (goal.name === priorityGoal) {
+                return {...goal, amountSaved: goal.amountSaved + priorityAmount};
+            } else {
+                return {...goal, amountSaved: goal.amountSaved + amountPerGoal};
             }
         });
 
@@ -117,7 +119,7 @@ export default function Home() {
             const savingsDocRef = doc(db, "savings", "wadia");
             await updateDoc(savingsDocRef, {
                 totalSaved: newTotalSaved,
-                savingsGoals: [...newGoals, ...updatedNonPriorityGoals]
+                savingsGoals: [...updatedSavingsGoals]
             });
         } catch (err) {
             console.log(err);
@@ -143,22 +145,23 @@ export default function Home() {
     }
 
     const generateData = (view: string) => {
-        if (view === 'week') {
+        if (view === '1M') {
             // return Array.from({length: 7}, () => Math.floor(Math.random() * 100));
             return [1000, 1050, 1100, 1200, 1300, 1350, 1450];
-        } else if (view === 'month') {
+        } else if (view === '3M') {
             // return Array.from({length: 30}, () => Math.floor(Math.random() * 100));
             return [1000, 1020, 1040, 1060, 1090, 1070,
                 1110, 1150, 1170, 1200, 1230, 1210,
                 1260, 1300, 1330, 1360, 1400, 1380,
                 1430, 1460, 1500, 1530, 1570, 1600,
                 1640, 1670, 1710, 1750, 1730, 1780];
-        } else if (view === 'year') {
+        } else if (view === '1Y') {
             // return Array.from({length: 12}, () => Math.floor(Math.random() * 100));
-            return [1000, 1200, 1400, 1350,
-                1600, 1850, 1800,
-                2050, 2300, 2550, 2800,
-                3050];
+            // return [1000, 1200, 1400, 1350,
+            //     1600, 1850, 1800,
+            //     2050, 2300, 2550, 2800,
+            //     3050];
+            return [0, 5000, 2500, 4000, 3000, 1000, 5000, 1900, 1500, 3000, 6250, 7000]
         }
         return []
     }
