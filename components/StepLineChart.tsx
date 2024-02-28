@@ -91,7 +91,7 @@ const StepLineChart = ({data, view}: any) => {
     };
 
     return (
-        <div className="p-4 bg-white shadow-lg rounded-lg">
+        <div>
             {/* @ts-ignore */}
             <Line data={chartData} options={options}/>
         </div>
