@@ -4,6 +4,7 @@ import Modal from "@/components/common/modals/Modal";
 import {BsTriangleFill} from "react-icons/bs";
 import {IoIosArrowForward} from "react-icons/io";
 import {Goal} from "@/lib/types";
+import GoalDetailsModal from "@/components/common/modals/GoalDetailsModal";
 
 interface DisplayGoalsProps {
     openCreateGoalModal: (e: any) => void;
@@ -99,7 +100,8 @@ const GoalCard = ({goal}: GoalCardProps) => {
     return (
         <>
             <li key={goal.name}
-                className={"flex flex-col w-full m-2 p-4 bg-white rounded-xl"}>
+                onClick={() => setIsGoalDetailsModalOpen(true)}
+                className={"flex flex-col w-full m-2 p-4 bg-white cursor-pointer rounded-xl"}>
 
                 <div className={"flex items-center"}>
                     {goal.imageUrl &&
@@ -123,32 +125,5 @@ const GoalCard = ({goal}: GoalCardProps) => {
                                   setIsGoalDetailsModalOpen={setIsGoalDetailsModalOpen}/>
             </li>
         </>
-    )
-}
-
-interface GoalDetailsModalProps {
-    goal: Goal;
-    isGoalDetailsModalOpen: boolean;
-    setIsGoalDetailsModalOpen: (isGoalDetailsModalOpen: boolean) => void;
-}
-
-const GoalDetailsModal = ({goal, isGoalDetailsModalOpen, setIsGoalDetailsModalOpen}: GoalDetailsModalProps) => {
-    return (
-        <Modal isModalOpen={isGoalDetailsModalOpen} setIsModalOpen={setIsGoalDetailsModalOpen}>
-            <div className={"flex flex-col items-center"}>
-                <img className={"rounded-lg w-full"} src={goal.imageUrl} alt={goal.name} width={100} height={100}/>
-                <p>{goal.name}</p>
-                <div className={"flex flex-col w-full"}>
-                    <div className={"my-2 overflow-hidden"}>
-                        <ProgressBar currentSaved={goal.amountSaved} totalRequired={goal.amountTarget}/>
-                    </div>
-                    <div className={"flex justify-between"}>
-                        <p className={""}>${goal.amountSaved}</p>
-                        <p>${goal.amountTarget}</p>
-                    </div>
-                </div>
-                <button onClick={() => setIsGoalDetailsModalOpen(false)}>Close</button>
-            </div>
-        </Modal>
     )
 }

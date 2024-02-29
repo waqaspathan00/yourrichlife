@@ -1,10 +1,25 @@
 import React, {useState} from 'react';
 import 'chart.js/auto';
 import {Line} from 'react-chartjs-2';
+import {getNumberOfDaysPassedInYear} from "@/lib/utils";
 
 const StepLineChart = ({data, view}: any) => {
 
-    let labels =Array.from({length: 365}, (_, i) => i + 1);
+    let labels;
+    if (view === "1M") {
+        labels = Array.from({length: 30}, (_, i) => i + 1);
+    } else if (view === "3M") {
+        labels = Array.from({length: 90}, (_, i) => i + 1);
+    } else if (view === "6M") {
+        labels = Array.from({length: 180}, (_, i) => i + 1);
+    } else if (view === "YTD") {
+        // create a variable representing the number of days that have passed in the year so far
+        const daysPassed = getNumberOfDaysPassedInYear()
+        labels = Array.from({length: daysPassed}, (_, i) => i + 1);
+    } else if (view === "1Y") {
+        labels = Array.from({length: 365}, (_, i) => i + 1);
+    }
+
 
     const chartData: any = {
         labels: labels,

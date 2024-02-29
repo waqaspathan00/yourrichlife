@@ -4,9 +4,9 @@ import AddSavingsTransactionModal from "@/components/common/modals/AddSavingsTra
 import Header from "@/components/Header";
 import SavingsChart from "@/components/common/SavingsChart";
 import DisplayGoals from "@/components/DisplayGoals";
-import {db} from "@/lib/firebase";
-import {doc, getDoc, updateDoc} from "@firebase/firestore";
+import {getSavingsData, updateSavingsDoc} from "@/lib/firebase";
 import DepositButton from "@/components/DepositButton";
+import {mockSavingsData} from "@/lib/utils";
 
 
 /**
@@ -24,9 +24,19 @@ import DepositButton from "@/components/DepositButton";
  *  During this process, the user can identify a goal to prioritize and what percentage of the transaction should go to that goal
  *
  * for next time:
- * - move firebase calls into a separate file
+ * - add a withdrawal feature
+ * - add a date to withdrawal/ deposit transactions
+ * - add file image upload for savings goals
+ *      - save the image to firebase storage
+ * - add ability to read a csv file of savings data and transform it into the data array
  * - add proper savings tracking over time logic
  *      - we may have to change the data array to be an array of objects with a date and amount saved
+ * - save the data array to firebase
+ * - add a sign in screen
+ * - add a remaining funds to be distributed to savings goals
+ * - add a delete button to savings goals
+ * - make savings goals editable
+ * - add tooltip on hover to chart to show amount and date
  *
  * @constructor
  */
@@ -63,15 +73,14 @@ export default function Home() {
     const [showAddButtons, setShowAddButtons] = useState(false);
 
     useEffect(() => {
-        // fetch existing data from firestore db under collection "savings" and document "wadia"
         const fetchData = async () => {
-            const savingsDocRef = doc(db, "savings", "wadia");
-            const savingsDoc = await getDoc(savingsDocRef);
-            const savingsData = savingsDoc.data();
+            const savingsData = await getSavingsData();
             setTotalSaved(savingsData?.totalSaved ? savingsData.totalSaved : 0);
             setSavingsGoals(savingsData?.savingsGoals ? savingsData.savingsGoals : []);
         }
+
         fetchData();
+        changeChartView(selectedView);
     }, [])
 
     const generateId = () => {
@@ -89,15 +98,10 @@ export default function Home() {
         };
         const newGoals = [...savingsGoals, newGoal];
 
-        try {
-            const savingsDocRef = doc(db, "savings", "wadia");
-            updateDoc(savingsDocRef, {
-                savingsGoals: newGoals
-            });
-        } catch (err) {
-            console.log(err);
-            throw new Error("Error saving data to DB");
-        }
+        const newSavingsData = {
+            savingsGoals: newGoals
+        };
+        updateSavingsDoc(newSavingsData)
 
         // @ts-ignore
         setSavingsGoals(newGoals);
@@ -121,390 +125,34 @@ export default function Home() {
             }
         });
 
-        try {
-            const savingsDocRef = doc(db, "savings", "wadia");
-            await updateDoc(savingsDocRef, {
-                totalSaved: newTotalSaved,
-                savingsGoals: [...updatedSavingsGoals]
-            });
-        } catch (err) {
-            console.log(err);
-            throw new Error("Error saving data to DB");
-        }
+        const newSavingsData = {
+            totalSaved: newTotalSaved,
+            savingsGoals: updatedSavingsGoals
+        };
+        updateSavingsDoc(newSavingsData)
         setTotalSaved(newTotalSaved);
         setIsAddSavingsModalOpen(false);
     };
 
     const changeChartView = (view: string) => {
         // let newData = generateData(view);
-        const newData = [0,
-            0,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            2500,
-            2500,
-            2500,
-            2500,
-            2500,
-            2500,
-            2500,
-            2500,
-            2500,
-            2500,
-            2500,
-            2500,
-            2500,
-            2500,
-            2500,
-            2500,
-            2500,
-            2500,
-            2500,
-            2500,
-            2500,
-            2500,
-            2500,
-            2500,
-            2500,
-            2500,
-            2500,
-            2500,
-            2500,
-            4000,
-            4000,
-            4000,
-            4000,
-            4000,
-            4000,
-            4000,
-            4000,
-            4000,
-            4000,
-            4000,
-            4000,
-            4000,
-            4000,
-            4000,
-            4000,
-            4000,
-            4000,
-            4000,
-            4000,
-            4000,
-            4000,
-            4000,
-            4000,
-            4000,
-            4000,
-            4000,
-            3000,
-            3000,
-            1000,
-            1000,
-            1000,
-            1000,
-            4000,
-            4000,
-            4000,
-            4000,
-            4000,
-            4000,
-            4000,
-            4000,
-            4000,
-            4000,
-            4000,
-            3000,
-            3000,
-            3000,
-            3000,
-            3000,
-            3000,
-            3000,
-            3000,
-            3000,
-            3000,
-            3000,
-            3000,
-            3000,
-            3000,
-            3000,
-            3000,
-            3000,
-            3000,
-            3000,
-            3000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            1000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            5000,
-            1900,
-            1900,
-            1900,
-            1900,
-            1900,
-            1900,
-            1900,
-            1900,
-            1900,
-            1900,
-            1900,
-            1900,
-            1900,
-            1900,
-            1900,
-            1900,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            1500,
-            2000,
-            2000,
-            2000,
-            2000,
-            2000,
-            2000,
-            2000,
-            2000,
-            2000,
-            2000,
-            2000,
-            2000,
-            2000,
-            2000,
-            2000,
-            2000,
-            2000,
-            2000,
-            2000,
-            2000,
-            2000,
-            2000,
-            2000,
-            2000,
-            2000,
-            2000,
-            2000,
-            2000,
-            2000,
-            2500,
-            2500,
-            2500,
-            2500,
-            2750,
-            2750,
-            2750,
-            2750,
-            6250,
-            6250,
-            6250,
-            6250,
-            6250,
-            6250,
-            6250,
-            6250,
-            6250,
-            6250,
-            6250,
-            6250,
-            6250,
-            6250,
-            6250,
-            7000,
-            7000,
-            7000,
-            7000,
-            7000,
-            7000,
-            7000,
-            7000,
-            7000,
-            7000,
-            7000,
-            7000,
-            6000,
-            6000]
+        const newData = transformData(mockSavingsData, view);
         setData(newData);
         setSelectedView(view);
+    }
+
+    const transformData = (data: any, view: string) => {
+        if (view === '1M') {
+            return data.slice(data.length - 30);
+        } else if (view === '3M') {
+            return data.slice(data.length - 90);
+        } else if (view === '6M') {
+            return data.slice(data.length - 180);
+        } else if (view === 'YTD') {
+            return data.slice(data.length - 365);
+        } else if (view === '1Y') {
+            return data.slice(data.length - 365);
+        }
     }
 
     const openAddSavingsModal = () => {

@@ -4,6 +4,7 @@ import {getAuth, GoogleAuthProvider} from "firebase/auth";
 import {signOut} from "@firebase/auth";
 import toast from "react-hot-toast";
 import {NextRouter} from "next/router";
+import {doc, getDoc, updateDoc} from "@firebase/firestore";
 
 const firebaseConfig = JSON.parse(process.env.NEXT_PUBLIC_FIREBASE_CONFIG as string);
 
@@ -19,3 +20,19 @@ export const handleSignOut = (router: NextRouter) => {
         router.push("/");
     });
 };
+
+export const updateSavingsDoc = async (newData: any) => {
+    try {
+        const savingsDocRef = doc(db, "savings", "wadia");
+        await updateDoc(savingsDocRef, newData);
+    } catch (err) {
+        console.log(err);
+        throw new Error("Error saving data to DB");
+    }
+}
+
+export const getSavingsData = async () => {
+    const savingsDocRef = doc(db, "savings", "wadia");
+    const savingsDoc = await getDoc(savingsDocRef);
+    return savingsDoc.data();
+}
