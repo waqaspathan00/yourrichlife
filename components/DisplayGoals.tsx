@@ -2,13 +2,15 @@ import React, {useState, useEffect} from "react"
 import ProgressBar from "@/components/ProgressBar";
 import Modal from "@/components/common/modals/Modal";
 import {BsTriangleFill} from "react-icons/bs";
+import {IoIosArrowForward} from "react-icons/io";
 import {Goal} from "@/lib/types";
 
 interface DisplayGoalsProps {
+    openCreateGoalModal: (e: any) => void;
     savingsGoals: Goal[]
 }
 
-export default function DisplayGoals({savingsGoals}: DisplayGoalsProps) {
+export default function DisplayGoals({openCreateGoalModal, savingsGoals}: DisplayGoalsProps) {
     const [displayNecessities, setDisplayNecessities] = useState(true);
     const [displayWants, setDisplayWants] = useState(true);
 
@@ -41,8 +43,12 @@ export default function DisplayGoals({savingsGoals}: DisplayGoalsProps) {
             <div className={"flex flex-col w-full mt-8 items-center"}>
                 <h2 className={"text-3xl text-left w-11/12 font-bold"}>Goals</h2>
 
-                <DisplayGoalsType goalDisplayType={"necessities"} displayGoals={displayNecessities} toggleGoalsDisplay={toggleGoalsDisplay} savingsGoals={savingsGoals}/>
-                <DisplayGoalsType goalDisplayType={"wants"} displayGoals={displayWants} toggleGoalsDisplay={toggleGoalsDisplay} savingsGoals={savingsGoals}/>
+                <DisplayGoalsType goalDisplayType={"necessities"} displayGoals={displayNecessities}
+                                  toggleGoalsDisplay={toggleGoalsDisplay} savingsGoals={savingsGoals}
+                                  openCreateGoalModal={openCreateGoalModal}/>
+                <DisplayGoalsType goalDisplayType={"wants"} displayGoals={displayWants}
+                                  toggleGoalsDisplay={toggleGoalsDisplay} savingsGoals={savingsGoals}
+                                  openCreateGoalModal={openCreateGoalModal}/>
             </div>
         </>
     )
@@ -52,9 +58,17 @@ interface DisplayGoalsTypeProps {
     goalDisplayType: string;
     displayGoals: boolean;
     toggleGoalsDisplay: (type: string) => void;
-    savingsGoals: Goal[]
+    savingsGoals: Goal[],
+    openCreateGoalModal: (goalDisplayType: string) => void;
 }
-const DisplayGoalsType = ({goalDisplayType, displayGoals, toggleGoalsDisplay, savingsGoals}: DisplayGoalsTypeProps) => {
+
+const DisplayGoalsType = ({
+                              goalDisplayType,
+                              displayGoals,
+                              toggleGoalsDisplay,
+                              savingsGoals,
+                              openCreateGoalModal
+                          }: DisplayGoalsTypeProps) => {
     const goalDisplayText = goalDisplayType.charAt(0).toUpperCase() + goalDisplayType.slice(1);
 
     return (
@@ -69,9 +83,9 @@ const DisplayGoalsType = ({goalDisplayType, displayGoals, toggleGoalsDisplay, sa
                         {goalDisplayText}
                     </h3>
                 </div>
-                <div className={"space-x-4"}>
-                    <button className={"border-b-blue-600 border-b-2"}>All</button>
-                    <button className={"text-gray-500"}>Achieved</button>
+                <div onClick={() => openCreateGoalModal(goalDisplayType)} className={"flex  items-center "}>
+                    <button className={"text-lg text-blue-600"}>add</button>
+                    <IoIosArrowForward className={"ml-1"}/>
                 </div>
             </div>
             <div className={"flex w-full justify-around flex-wrap"}>
@@ -93,9 +107,9 @@ const GoalCard = ({goal}: GoalCardProps) => {
     return (
         <>
             <li key={goal.name}
-                className={" flex flex-col items-center justify-between w-1/3 m-2 p-4 bg-white rounded-xl"}>
+                className={"flex items-center justify-between w-full m-2 p-4 bg-white rounded-xl"}>
                 {goal.imageUrl &&
-                    <img className={"rounded-lg w-full"} src={goal.imageUrl} alt={goal.name} width={100}/>}
+                    <img className={"rounded-full w-16 h-16"} src={goal.imageUrl} alt={goal.name} width={100}/>}
                 <p className={"capitalize"}>{goal.name}</p>
                 <div className={"flex flex-col w-full"}>
                     <div className={"my-2 overflow-hidden"}>

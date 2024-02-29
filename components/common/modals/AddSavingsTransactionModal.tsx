@@ -23,7 +23,7 @@ export default function AddSavingsTransactionModal({
                            value={amount} onChange={(e) => setAmount(parseInt(e.target.value))}/>
                 </div>
                 <div className={"flex justify-between space-x-2"}>
-                    <div className={"flex flex-col w-1/2"}>
+                    <div className={"flex flex-col w-3/4"}>
                         <label htmlFor="goal">
                             Priority Goal
                         </label>
@@ -35,7 +35,7 @@ export default function AddSavingsTransactionModal({
                             ))}
                         </select>
                     </div>
-                    <div className={"flex flex-col w-1/2"}>
+                    <div className={"flex flex-col w-1/4"}>
                         <label htmlFor="percentage">
                             Percentage
                         </label>

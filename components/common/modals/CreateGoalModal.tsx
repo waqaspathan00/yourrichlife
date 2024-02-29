@@ -1,15 +1,16 @@
 import React, {useState, useEffect} from "react"
 import Modal from "@/components/common/modals/Modal";
 
-export default function CreateGoalModal({isCreateGoalModalOpen, setIsCreateGoalModalOpen, handleClose, createSavingsGoal}: any){
+export default function CreateGoalModal({createGoalModalType, isCreateGoalModalOpen, setIsCreateGoalModalOpen, createSavingsGoal}: any){
     const [name, setName] = useState("");
     const [amount, setAmount] = useState(0);
     const [imageUrl, setImageUrl] = useState("");
+    const goalModalTypeText = createGoalModalType === "necessities" ? "Necessity" : "Want";
 
     return (
         <Modal isModalOpen={isCreateGoalModalOpen} setIsModalOpen={setIsCreateGoalModalOpen}>
             <div className={"bg-white rounded-lg"}>
-                <h2 className={"text-center text-xl font-bold mb-4"}>Create a new Savings Goal</h2>
+                <h2 className={"text-center text-xl font-bold mb-4"}>{goalModalTypeText} Goal</h2>
                 <div className={"space-y-4"}>
                     <div className={"flex flex-col"}>
                         <label htmlFor="name">

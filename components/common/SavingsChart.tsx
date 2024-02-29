@@ -31,7 +31,7 @@ const ChangeChartViewButton = ({selectedView, changeChartView, view}: {
 }) => {
     return (
         <button
-            className={`${selectedView === view ? "text-white bg-blue-600" : "text-gray-400 "} font-bold transition-all w-full p-2 rounded-full`}
+            className={`${selectedView === view ? "text-white bg-blue-600" : "text-gray-400 "} font-bold transition-all w-full p-2 mx-1 rounded-full`}
             onClick={() => changeChartView(view)}>{view}
         </button>
     )

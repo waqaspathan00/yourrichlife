@@ -24,6 +24,8 @@ import {doc, getDoc, updateDoc} from "@firebase/firestore";
  *  During this process, the user can identify a goal to prioritize and what percentage of the transaction should go to that goal
  *
  * for next time:
+ * - put an add button on the right side of the row for the goal types, and when clicked it will open a modal to add a new goal
+ * - put a deposit button in green at the top and bottom of the screen, and when clicked it will open a modal to add a new transaction
  * - move firebase calls into a separate file
  * - add a view button to goals to see more details about the goal and to edit and delete it
  * - add horizontal spacing to goals
@@ -34,6 +36,7 @@ import {doc, getDoc, updateDoc} from "@firebase/firestore";
  */
 export default function Home() {
     const [isCreateGoalModalOpen, setIsCreateGoalModalOpen] = useState(false);
+    const [createGoalModalType, setCreateGoalModalType] = useState('');
     const [isAddSavingsModalOpen, setIsAddSavingsModalOpen] = useState(false);
     const [savingsGoals, setSavingsGoals] = useState(
         [
@@ -81,7 +84,12 @@ export default function Home() {
 
     const addSavingsGoal = (name: string, amount: number, imageUrl: string) => {
         const newGoal = {
-            id: generateId(), imageUrl, name, amountTarget: amount, amountSaved: 0
+            id: generateId(),
+            type: createGoalModalType,
+            imageUrl,
+            name,
+            amountTarget: amount,
+            amountSaved: 0,
         };
         const newGoals = [...savingsGoals, newGoal];
 
@@ -146,6 +154,11 @@ export default function Home() {
         setShowAddButtons(false);
     }
 
+    const openCreateGoalModal = (goalDisplayType: string) => {
+        setIsCreateGoalModalOpen(true);
+        setCreateGoalModalType(goalDisplayType)
+    }
+
     const generateData = (view: string) => {
         if (view === '1M') {
             // return Array.from({length: 7}, () => Math.floor(Math.random() * 100));
@@ -172,16 +185,16 @@ export default function Home() {
         <main className="flex flex-col items-center bg-gray-100 h-screen relative">
             <Header totalSaved={totalSaved}/>
             <SavingsChart data={data} selectedView={selectedView} changeChartView={changeChartView}/>
-            <DisplayGoals savingsGoals={savingsGoals}/>
+            <DisplayGoals openCreateGoalModal={openCreateGoalModal} savingsGoals={savingsGoals}/>
 
             <CreateButtonsPane showAddButtons={showAddButtons} setShowAddButtons={setShowAddButtons}
                                openModal={openModal}/>
-            <CreateGoalModal createSavingsGoal={addSavingsGoal} isCreateGoalModalOpen={isCreateGoalModalOpen}
-                             setIsCreateGoalModalOpen={setIsCreateGoalModalOpen}/>
             <AddSavingsTransactionModal addSavingsTransaction={addSavingsTransaction}
                                         isAddTransactionModalOpen={isAddSavingsModalOpen}
                                         setIsAddTransactionModalOpen={setIsAddSavingsModalOpen}
                                         savingsGoals={savingsGoals}/>
+            <CreateGoalModal createSavingsGoal={addSavingsGoal} createGoalModalType={createGoalModalType}
+                             isCreateGoalModalOpen={isCreateGoalModalOpen} setIsCreateGoalModalOpen={setIsCreateGoalModalOpen}/>
         </main>
     );
 }

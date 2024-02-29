@@ -32,15 +32,20 @@ export default function CreateButtonsPane({showAddButtons, setShowAddButtons, op
                             <FaFlag className={"text-blue-600 text-2xl "}/>
                         </button>
                     </div>
-                    <div className={"absolute right-5 bottom-32 flex items-center space-x-2"}>
-                        <p>Add Savings</p>
-                        <button className={"bg-white rounded-full p-2"}
-                                onClick={() => openModal("savings")}>
-                            <MdOutlineAttachMoney className={"text-blue-600 text-2xl "}/>
-                        </button>
-                    </div>
                 </>
             )}
         </>
     )
 }
+
+/**
+ * add a toggle for results pane
+ * - subscription is not working
+ * add a mix of true false and multiple choice questions
+ * add a game effect ot the background of answering questions
+ *  - example: a shark eating a submarine, get away from the shark
+ *  -
+ *  - if everyone clicks on the correct icon displayed by the cabin
+ * - look up gimkit and implement from there
+ * - look up kahoot pro
+ */
