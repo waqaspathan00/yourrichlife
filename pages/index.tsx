@@ -38,12 +38,14 @@ export default function Home() {
     const [savingsGoals, setSavingsGoals] = useState(
         [
             // {
+            //     "type": "necessities",
             //     "imageUrl": "https://pictures.dealer.com/generic--OEM_VIN_STOCK_PHOTOS/8184fecc2b4e3f725c098692df721e13.jpg?impolicy=downsize_bkpt&imdensity=1&w=520",
             //     "name": "Subaru Outback",
             //     "amountTarget": 1000,
             //     "amountSaved": 500
             // },
             // {
+            //     "type": "wants",
             //     "imageUrl": "https://i.ebayimg.com/images/g/ExIAAOSwIyxhpCpv/s-l1200.webp",
             //     "name": "Wedding Suit",
             //     "amountTarget": 200,

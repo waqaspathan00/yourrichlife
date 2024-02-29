@@ -13,13 +13,13 @@ export default function AddSavingsTransactionModal({
 
     return (
         <Modal isModalOpen={isAddTransactionModalOpen} setIsModalOpen={setIsAddTransactionModalOpen}>
-            <h2 className={"text-center text-xl font-bold my-4"}>Add Savings</h2>
+            <h2 className={"text-center text-xl font-bold"}>Add Savings</h2>
             <div className={"space-y-4"}>
                 <div className={"flex flex-col"}>
                     <label htmlFor="amount">
                         Amount
                     </label>
-                    <input className={"border-2 p-2 rounded-md"} type="number" id="amount" name="amount"
+                    <input className={"border-2 p-2 rounded-md"} type="number" id="amount" name="amount" placeholder={"Amount"}
                            value={amount} onChange={(e) => setAmount(parseInt(e.target.value))}/>
                 </div>
                 <div className={"flex justify-between space-x-2"}>
