@@ -22,33 +22,25 @@ export default function DisplayGoals({openCreateGoalModal, savingsGoals}: Displa
         }
     }
 
-
-    if (savingsGoals.length === 0) {
-        return (
-            <div className={"flex flex-col w-full mt-8 items-center"}>
-                <div className={"w-11/12 flex justify-between mb-2"}>
-                    <h2 className={"text-xl"}>Goals</h2>
-                    <div className={"space-x-4"}>
-                        <button className={"border-b-blue-600 border-b-2"}>All</button>
-                        <button className={"text-gray-500"}>Achieved</button>
-                    </div>
-                </div>
-                <p className={"text-gray-500"}>No goals yet</p>
-            </div>
-        )
-    }
-
     return (
         <>
-            <div className={"flex flex-col w-full mt-8 items-center"}>
+            <div className={"flex flex-col w-full items-center"}>
                 <h2 className={"text-3xl text-left w-11/12 font-bold"}>Goals</h2>
 
-                <DisplayGoalsType goalDisplayType={"necessities"} displayGoals={displayNecessities}
-                                  toggleGoalsDisplay={toggleGoalsDisplay} savingsGoals={savingsGoals}
-                                  openCreateGoalModal={openCreateGoalModal}/>
-                <DisplayGoalsType goalDisplayType={"wants"} displayGoals={displayWants}
-                                  toggleGoalsDisplay={toggleGoalsDisplay} savingsGoals={savingsGoals}
-                                  openCreateGoalModal={openCreateGoalModal}/>
+                {savingsGoals.length === 0
+                    ? <p className={"text-gray-500"}>No goals yet</p>
+                    : (
+                        <>
+                            <DisplayGoalsType goalDisplayType={"necessities"} displayGoals={displayNecessities}
+                                              toggleGoalsDisplay={toggleGoalsDisplay} savingsGoals={savingsGoals}
+                                              openCreateGoalModal={openCreateGoalModal}/>
+                            <DisplayGoalsType goalDisplayType={"wants"} displayGoals={displayWants}
+                                              toggleGoalsDisplay={toggleGoalsDisplay} savingsGoals={savingsGoals}
+                                              openCreateGoalModal={openCreateGoalModal}/>
+                        </>
+                    )
+                }
+
             </div>
         </>
     )
@@ -98,7 +90,7 @@ const DisplayGoalsType = ({
 }
 
 interface GoalCardProps {
-    goal: { name: string, imageUrl: string, amountSaved: number, amountTarget: number }
+    goal: Goal
 }
 
 const GoalCard = ({goal}: GoalCardProps) => {
@@ -107,12 +99,17 @@ const GoalCard = ({goal}: GoalCardProps) => {
     return (
         <>
             <li key={goal.name}
-                className={"flex items-center justify-between w-full m-2 p-4 bg-white rounded-xl"}>
-                {goal.imageUrl &&
-                    <img className={"rounded-full w-16 h-16"} src={goal.imageUrl} alt={goal.name} width={100}/>}
-                <p className={"capitalize"}>{goal.name}</p>
-                <div className={"flex flex-col w-full"}>
-                    <div className={"my-2 overflow-hidden"}>
+                className={"flex flex-col w-full m-2 p-4 bg-white rounded-xl"}>
+
+                <div className={"flex items-center"}>
+                    {goal.imageUrl &&
+                        <img className={"rounded-full w-16 h-16"} src={goal.imageUrl} alt={goal.name} width={100}/>}
+
+                    <p className={"capitalize text-xl ml-4"}>{goal.name}</p>
+                </div>
+
+                <div className={"flex flex-col w-full mt-4"}>
+                    <div className={"overflow-hidden"}>
                         <ProgressBar currentSaved={goal.amountSaved} totalRequired={goal.amountTarget}/>
                     </div>
                     <div className={"flex justify-between"}>
@@ -120,7 +117,8 @@ const GoalCard = ({goal}: GoalCardProps) => {
                         <p>${goal.amountTarget}</p>
                     </div>
                 </div>
-                <button onClick={() => setIsGoalDetailsModalOpen(true)}>View</button>
+
+                {/*<button onClick={() => setIsGoalDetailsModalOpen(true)}>View</button>*/}
                 <GoalDetailsModal goal={goal} isGoalDetailsModalOpen={isGoalDetailsModalOpen}
                                   setIsGoalDetailsModalOpen={setIsGoalDetailsModalOpen}/>
             </li>
@@ -129,7 +127,7 @@ const GoalCard = ({goal}: GoalCardProps) => {
 }
 
 interface GoalDetailsModalProps {
-    goal: { name: string, imageUrl: string, amountSaved: number, amountTarget: number };
+    goal: Goal;
     isGoalDetailsModalOpen: boolean;
     setIsGoalDetailsModalOpen: (isGoalDetailsModalOpen: boolean) => void;
 }

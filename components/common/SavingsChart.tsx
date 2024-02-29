@@ -8,7 +8,6 @@ interface SavingsChartProps {
 }
 
 export default function SavingsChart({data, selectedView, changeChartView}: SavingsChartProps) {
-    console.log(selectedView)
 
     return (
         <div className={"w-11/12 bg-white rounded-lg mt-4 p-4 shadow-lg"}>
