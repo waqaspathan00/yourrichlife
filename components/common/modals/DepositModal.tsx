@@ -2,19 +2,19 @@ import React, {useState} from "react"
 import Modal from "@/components/common/modals/Modal";
 import DatePickerTailwind from "@/components/common/DatePicker";
 
-export default function AddSavingsTransactionModal({
-                                                       isAddTransactionModalOpen,
-                                                       setIsAddTransactionModalOpen,
-                                                       addSavingsTransaction,
-                                                       savingsGoals
-                                                   }: any) {
+export default function DepositModal({
+                                         isDepositModalOpen,
+                                         setIsDepositModalOpen,
+                                         addSavingsTransaction,
+                                         savingsGoals
+                                     }: any) {
     const [savingsDate, setSavingsDate] = useState(new Date());
     const [amount, setAmount] = useState(0);
     const [priorityGoal, setPriorityGoal] = useState("");
     const [percentage, setPercentage] = useState(0);
 
     return (
-        <Modal isModalOpen={isAddTransactionModalOpen} setIsModalOpen={setIsAddTransactionModalOpen}>
+        <Modal isModalOpen={isDepositModalOpen} setIsModalOpen={setIsDepositModalOpen}>
             <h2 className={"text-center text-xl font-bold"}>Add Savings</h2>
             <div className={"space-y-4"}>
                 <DatePickerTailwind savingsDate={savingsDate} setSavingsDate={setSavingsDate}/>
@@ -50,8 +50,9 @@ export default function AddSavingsTransactionModal({
                     </div>
                 </div>
                 <button className={"bg-blue-600 w-full rounded-full p-2 text-white"}
-                        onClick={() => addSavingsTransaction(savingsDate, amount, priorityGoal, percentage)} type="submit">
-                    Add
+                        onClick={() => addSavingsTransaction(savingsDate, amount, priorityGoal, percentage)}
+                        type="submit">
+                    Deposit
                 </button>
             </div>
         </Modal>

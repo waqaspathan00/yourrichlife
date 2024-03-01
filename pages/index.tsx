@@ -1,12 +1,13 @@
 import React, {useEffect, useState} from "react";
 import CreateGoalModal from "@/components/common/modals/CreateGoalModal";
-import AddSavingsTransactionModal from "@/components/common/modals/AddSavingsTransactionModal";
+import DepositModal from "@/components/common/modals/DepositModal";
 import Header from "@/components/Header";
 import SavingsChart from "@/components/common/SavingsChart";
 import DisplayGoals from "@/components/DisplayGoals";
 import {getSavingsData, updateSavingsDoc} from "@/lib/firebase";
 import DepositButton from "@/components/DepositButton";
-import {mockDailySavingsBalance} from "@/lib/utils";
+import WithdrawalButton from "@/components/common/WithdrawalButton";
+import WithdrawalModal from "@/components/common/modals/WithdrawalModal";
 
 
 /**
@@ -62,7 +63,8 @@ import {mockDailySavingsBalance} from "@/lib/utils";
 export default function Home() {
     const [isCreateGoalModalOpen, setIsCreateGoalModalOpen] = useState(false);
     const [createGoalModalType, setCreateGoalModalType] = useState('');
-    const [isAddSavingsModalOpen, setIsAddSavingsModalOpen] = useState(false);
+    const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
+    const [isWithdrawalModalOpen, setIsWithdrawalModalOpen] = useState(false);
     const [savingsGoals, setSavingsGoals] = useState(
         [
             // {
@@ -89,7 +91,7 @@ export default function Home() {
     useEffect(() => {
         const fetchData = async () => {
             const savingsData = await getSavingsData();
-            if (savingsData){
+            if (savingsData) {
                 const fetchedSavingsData = savingsData.dailySavingsBalance
                 setDailySavingsBalanceMasterData(savingsData.dailySavingsBalance);
                 setTotalSaved(fetchedSavingsData[fetchedSavingsData.length - 1].amount)
@@ -126,6 +128,11 @@ export default function Home() {
         setIsCreateGoalModalOpen(false);
     }
 
+    /**
+     * when the user adds a new savings transaction:
+     * - add the amount to the dailySavingsBalance array
+     * - distribute to the savings goals that the user has set up
+     */
     const addSavingsTransaction = async (savingsDate: Date, amount: string, priorityGoal: string, percentage: string) => {
         const newSavingsBalance = [...dailySavingsBalanceMasterData];
         const lastElement = newSavingsBalance[newSavingsBalance.length - 1];
@@ -160,7 +167,7 @@ export default function Home() {
         };
         updateSavingsDoc(newSavingsData)
         setTotalSaved(newSavingsBalance[newSavingsBalance.length - 1].amount);
-        setIsAddSavingsModalOpen(false);
+        setIsDepositModalOpen(false);
     };
 
     const changeChartView = (view: string) => {
@@ -183,8 +190,11 @@ export default function Home() {
         }
     }
 
-    const openAddSavingsModal = () => {
-        setIsAddSavingsModalOpen(true);
+    const openWithdrawalModal = () => {
+        setIsWithdrawalModalOpen(true);
+    }
+    const openDepositModal = () => {
+        setIsDepositModalOpen(true);
     }
 
     const openCreateGoalModal = (goalDisplayType: string) => {
@@ -195,16 +205,22 @@ export default function Home() {
     return (
         <main className="flex flex-col items-center bg-gray-100 relative disable-scroll">
             <Header totalSaved={totalSaved}/>
-            <SavingsChart dailySavingsBalance={dailySavingsBalanceChartData} selectedView={selectedView} changeChartView={changeChartView}/>
+            <SavingsChart dailySavingsBalance={dailySavingsBalanceChartData} selectedView={selectedView}
+                          changeChartView={changeChartView}/>
 
-            <DepositButton openAddSavingsModal={openAddSavingsModal}/>
+            <div className={"flex w-11/12 my-4 space-x-4"}>
+                <WithdrawalButton openWithdrawalModal={openWithdrawalModal}/>
+                <DepositButton openDepositModal={openDepositModal}/>
+            </div>
 
             <DisplayGoals openCreateGoalModal={openCreateGoalModal} savingsGoals={savingsGoals}/>
 
-            <AddSavingsTransactionModal addSavingsTransaction={addSavingsTransaction}
-                                        isAddTransactionModalOpen={isAddSavingsModalOpen}
-                                        setIsAddTransactionModalOpen={setIsAddSavingsModalOpen}
-                                        savingsGoals={savingsGoals}/>
+            <WithdrawalModal isWithdrawalModalOpen={isWithdrawalModalOpen}
+                             setIsWithdrawalModalOpen={setIsWithdrawalModalOpen}/>
+            <DepositModal addSavingsTransaction={addSavingsTransaction}
+                          isDepositModalOpen={isDepositModalOpen}
+                          setIsDepositModalOpen={setIsDepositModalOpen}
+                          savingsGoals={savingsGoals}/>
             <CreateGoalModal createSavingsGoal={createSavingsGoal} createGoalModalType={createGoalModalType}
                              isCreateGoalModalOpen={isCreateGoalModalOpen}
                              setIsCreateGoalModalOpen={setIsCreateGoalModalOpen}/>

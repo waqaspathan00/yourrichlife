@@ -1,7 +1,7 @@
-import React, {useState, useEffect} from "react"
+import React from "react"
 
 interface DepositButtonProps {
-    openAddSavingsModal: () => void;
+    openDepositModal: () => void;
 }
 
 /**
@@ -12,10 +12,10 @@ interface DepositButtonProps {
  *
  * @constructor
  */
-export default function DepositButton({openAddSavingsModal}: DepositButtonProps) {
+export default function DepositButton({openDepositModal}: DepositButtonProps) {
     return (
-        <div className={"flex justify-center my-4 w-full"}>
-            <button onClick={openAddSavingsModal} className="bg-green-400 w-11/12 rounded-lg p-4 text-lg cursor-pointer hover:bg-green-600 text-white">+ Deposit</button>
-        </div>
+        <button onClick={openDepositModal}
+                className="bg-green-400 w-full rounded-lg p-4 text-lg cursor-pointer hover:bg-green-600 text-white">
+            + Deposit</button>
     )
 }
