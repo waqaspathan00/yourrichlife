@@ -2,8 +2,13 @@ import React, {useState} from 'react';
 import 'chart.js/auto';
 import {Line} from 'react-chartjs-2';
 import {getNumberOfDaysPassedInYear} from "@/lib/utils";
+import {DailySavingsBalance} from "@/lib/types";
 
-const StepLineChart = ({data, view}: any) => {
+interface StepLineChartProps {
+    dailySavingsBalance: DailySavingsBalance[];
+    view: string;
+}
+const StepLineChart = ({dailySavingsBalance, view}: StepLineChartProps) => {
 
     let labels;
     if (view === "1M") {
@@ -26,7 +31,7 @@ const StepLineChart = ({data, view}: any) => {
         datasets: [
             {
                 label: 'Step Line Data',
-                data: data,
+                data: dailySavingsBalance,
                 borderColor: '#3B66FF',
                 borderWidth: 2,
                 fill: true,

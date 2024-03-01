@@ -7,4 +7,9 @@ export type Goal = {
     amountTarget: number
 }
 
+export type DailySavingsBalance = {
+    date: string,
+    amount: number
+}
+
 export type ChartView = "1M" | "3M" | "YTD" | "1Y" | "ALL"

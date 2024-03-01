@@ -2,16 +2,16 @@ import React, {useState, useEffect} from "react"
 import StepLineChart from "@/components/StepLineChart";
 
 interface SavingsChartProps {
-    data: number[];
+    dailySavingsBalance: number[];
     selectedView: string;
     changeChartView: (view: string) => void;
 }
 
-export default function SavingsChart({data, selectedView, changeChartView}: SavingsChartProps) {
+export default function SavingsChart({dailySavingsBalance, selectedView, changeChartView}: SavingsChartProps) {
 
     return (
         <div className={"w-11/12 bg-white rounded-lg mt-4 p-4 shadow-lg"}>
-            <StepLineChart data={data} view={selectedView}/>
+            <StepLineChart dailySavingsBalance={dailySavingsBalance} view={selectedView}/>
             <div className={"flex w-full rounded-lg"}>
                 <ChangeChartViewButton view={"1M"} selectedView={selectedView} changeChartView={changeChartView}/>
                 <ChangeChartViewButton view={"3M"} selectedView={selectedView} changeChartView={changeChartView}/>

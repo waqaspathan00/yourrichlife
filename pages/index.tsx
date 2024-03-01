@@ -82,20 +82,19 @@ export default function Home() {
         ]
     );
     const [selectedView, setSelectedView] = useState('3M'); // Default view
-    const [data, setData] = useState(
+    const [dailySavingsBalance, setDailySavingsBalance] = useState(
         [1000, 1020, 1040, 1060, 1090, 1070,
             1110, 1150, 1170, 1200, 1230, 1210,
             1260, 1300, 1330, 1360, 1400, 1380,
             1430, 1460, 1500, 1530, 1570, 1600,
-            1640, 1670, 1710, 1750, 1730, 1780]); // Example data array
-    // totalSaved will be the last element in the data array
-    const [totalSaved, setTotalSaved] = useState(data[data.length - 1]);
+            1640, 1670, 1710, 1750, 1730, 1780]);
+    const [totalSaved, setTotalSaved] = useState(dailySavingsBalance[dailySavingsBalance.length - 1]);
 
     useEffect(() => {
         const fetchData = async () => {
             const savingsData = await getSavingsData();
             // setTotalSaved(savingsData?.totalSaved ? savingsData.totalSaved : 0);
-            setTotalSaved(data[data.length - 1])
+            setTotalSaved(dailySavingsBalance[dailySavingsBalance.length - 1])
             setSavingsGoals(savingsData?.savingsGoals ? savingsData.savingsGoals : []);
         }
 
@@ -157,7 +156,7 @@ export default function Home() {
     const changeChartView = (view: string) => {
         // let newData = generateData(view);
         const newData = transformData(mockSavingsData, view);
-        setData(newData);
+        setDailySavingsBalance(newData);
         setSelectedView(view);
     }
 
@@ -187,7 +186,7 @@ export default function Home() {
     return (
         <main className="flex flex-col items-center bg-gray-100 relative disable-scroll">
             <Header totalSaved={totalSaved}/>
-            <SavingsChart data={data} selectedView={selectedView} changeChartView={changeChartView}/>
+            <SavingsChart dailySavingsBalance={dailySavingsBalance} selectedView={selectedView} changeChartView={changeChartView}/>
             <DepositButton openAddSavingsModal={openAddSavingsModal}/>
             <DisplayGoals openCreateGoalModal={openCreateGoalModal} savingsGoals={savingsGoals}/>
 
