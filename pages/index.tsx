@@ -34,6 +34,7 @@ import {mockDailySavingsBalance} from "@/lib/utils";
  * - add a delete button to savings goals
  * - make savings goals editable
  * - add tooltip on hover to chart to show amount and date
+ * - round out goal disbursement logic, and to the nearest dollar
 
  * - add a circular progress bar to the savings goals
  * - plaid integration
@@ -47,7 +48,6 @@ import {mockDailySavingsBalance} from "@/lib/utils";
  *      - data array
  *      - selected view
  * - savings tracking logic:
- *   - the array holding the savings data will be called "savingBalancesPerDay"
  *   - save the data array to firebase
  *   - the array will be updated every time a deposit or withdrawal is made
  *   - the array will be used to generate the chart
@@ -82,20 +82,22 @@ export default function Home() {
         ]
     );
     const [selectedView, setSelectedView] = useState('3M'); // Default view
-    const [dailySavingsBalance, setDailySavingsBalance] = useState([]);
+    const [dailySavingsBalanceMasterData, setDailySavingsBalanceMasterData]: any = useState([]);
+    const [dailySavingsBalanceChartData, setDailySavingsBalanceChartData] = useState([]);
     const [totalSaved, setTotalSaved] = useState(0);
 
     useEffect(() => {
         const fetchData = async () => {
             const savingsData = await getSavingsData();
-            // setTotalSaved(savingsData?.totalSaved ? savingsData.totalSaved : 0);
-            // const todaysSavingBalance = dailySavingsBalance[dailySavingsBalance.length - 1].amount
-            // console.log(todaysSavingBalance)
-            // setTotalSaved(todaysSavingBalance)
-            setSavingsGoals(savingsData?.savingsGoals ? savingsData.savingsGoals : []);
+            if (savingsData){
+                const fetchedSavingsData = savingsData.dailySavingsBalance
+                setDailySavingsBalanceMasterData(savingsData.dailySavingsBalance);
+                setTotalSaved(fetchedSavingsData[fetchedSavingsData.length - 1].amount)
+                setSavingsGoals(savingsData.savingsGoals);
+                changeChartView(selectedView);
+            }
         }
 
-        changeChartView(selectedView);
         fetchData();
     }, [])
 
@@ -103,7 +105,7 @@ export default function Home() {
         return Math.floor(Math.random() * 1000000);
     }
 
-    const addSavingsGoal = (name: string, amount: number, imageUrl: string) => {
+    const createSavingsGoal = (name: string, amount: number, imageUrl: string) => {
         const newGoal = {
             id: generateId(),
             type: createGoalModalType,
@@ -124,10 +126,19 @@ export default function Home() {
         setIsCreateGoalModalOpen(false);
     }
 
-    const addSavingsTransaction = async (date: string, amount: string, priorityGoal: string, percentage: string) => {
-        //
+    const addSavingsTransaction = async (savingsDate: Date, amount: string, priorityGoal: string, percentage: string) => {
+        const newSavingsBalance = [...dailySavingsBalanceMasterData];
+        const lastElement = newSavingsBalance[newSavingsBalance.length - 1];
+        const formattedDate = savingsDate.toLocaleDateString();
+        if (lastElement.date !== formattedDate) {
+            newSavingsBalance.push({date: formattedDate, amount: lastElement.amount});
+            if (newSavingsBalance.length > 365) {
+                newSavingsBalance.shift();
+            }
+        } else {
+            lastElement.amount += parseInt(amount);
+        }
 
-        const newTotalSaved = totalSaved + parseInt(amount);
         const totalAmount = parseInt(amount);
         const priorityPercentage = parseInt(percentage) / 100;
         const priorityAmount = totalAmount * priorityPercentage;
@@ -144,19 +155,17 @@ export default function Home() {
         });
 
         const newSavingsData = {
-            totalSaved: newTotalSaved,
+            dailySavingsBalance: newSavingsBalance,
             savingsGoals: updatedSavingsGoals
         };
         updateSavingsDoc(newSavingsData)
-        setTotalSaved(newTotalSaved);
+        setTotalSaved(newSavingsBalance[newSavingsBalance.length - 1].amount);
         setIsAddSavingsModalOpen(false);
     };
 
     const changeChartView = (view: string) => {
-        // let newData = generateData(view);
-        const newData = transformData(mockDailySavingsBalance, view);
-        setDailySavingsBalance(newData);
-        setTotalSaved(newData[newData.length - 1].amount);
+        const newData = transformData(dailySavingsBalanceMasterData, view);
+        setDailySavingsBalanceChartData(newData);
         setSelectedView(view);
     }
 
@@ -186,15 +195,17 @@ export default function Home() {
     return (
         <main className="flex flex-col items-center bg-gray-100 relative disable-scroll">
             <Header totalSaved={totalSaved}/>
-            <SavingsChart dailySavingsBalance={dailySavingsBalance} selectedView={selectedView} changeChartView={changeChartView}/>
+            <SavingsChart dailySavingsBalance={dailySavingsBalanceChartData} selectedView={selectedView} changeChartView={changeChartView}/>
+
             <DepositButton openAddSavingsModal={openAddSavingsModal}/>
+
             <DisplayGoals openCreateGoalModal={openCreateGoalModal} savingsGoals={savingsGoals}/>
 
             <AddSavingsTransactionModal addSavingsTransaction={addSavingsTransaction}
                                         isAddTransactionModalOpen={isAddSavingsModalOpen}
                                         setIsAddTransactionModalOpen={setIsAddSavingsModalOpen}
                                         savingsGoals={savingsGoals}/>
-            <CreateGoalModal createSavingsGoal={addSavingsGoal} createGoalModalType={createGoalModalType}
+            <CreateGoalModal createSavingsGoal={createSavingsGoal} createGoalModalType={createGoalModalType}
                              isCreateGoalModalOpen={isCreateGoalModalOpen}
                              setIsCreateGoalModalOpen={setIsCreateGoalModalOpen}/>
         </main>

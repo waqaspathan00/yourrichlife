@@ -1,5 +1,9 @@
 export const mockDailySavingsBalance = [
     {
+        "date": "3/2/2023",
+        "amount": 5000
+    },
+    {
         "date": "3/3/2023",
         "amount": 5000
     },
@@ -1456,7 +1460,7 @@ export const mockDailySavingsBalance = [
         "amount": 6000
     },
     {
-        "date": "3/1/2023",
+        "date": "3/1/2024",
         "amount": 6000
     },
 ]

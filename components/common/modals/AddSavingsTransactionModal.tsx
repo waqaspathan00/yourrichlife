@@ -8,7 +8,7 @@ export default function AddSavingsTransactionModal({
                                                        addSavingsTransaction,
                                                        savingsGoals
                                                    }: any) {
-    const [startDate, setStartDate] = useState(new Date());
+    const [savingsDate, setSavingsDate] = useState(new Date());
     const [amount, setAmount] = useState(0);
     const [priorityGoal, setPriorityGoal] = useState("");
     const [percentage, setPercentage] = useState(0);
@@ -17,7 +17,7 @@ export default function AddSavingsTransactionModal({
         <Modal isModalOpen={isAddTransactionModalOpen} setIsModalOpen={setIsAddTransactionModalOpen}>
             <h2 className={"text-center text-xl font-bold"}>Add Savings</h2>
             <div className={"space-y-4"}>
-                <DatePickerTailwind startDate={startDate} setStartDate={setStartDate}/>
+                <DatePickerTailwind savingsDate={savingsDate} setSavingsDate={setSavingsDate}/>
 
                 <div className={"flex flex-col"}>
                     <label htmlFor="amount">
@@ -50,7 +50,7 @@ export default function AddSavingsTransactionModal({
                     </div>
                 </div>
                 <button className={"bg-blue-600 w-full rounded-full p-2 text-white"}
-                        onClick={() => addSavingsTransaction(amount, priorityGoal, percentage)} type="submit">
+                        onClick={() => addSavingsTransaction(savingsDate, amount, priorityGoal, percentage)} type="submit">
                     Add
                 </button>
             </div>

@@ -76,8 +76,8 @@ const DisplayGoalsType = ({
                         {goalDisplayText}
                     </h3>
                 </div>
-                <div onClick={() => openCreateGoalModal(goalDisplayType)} className={"flex  items-center "}>
-                    <button className={"text-lg text-blue-600"}>add</button>
+                <div onClick={() => openCreateGoalModal(goalDisplayType)} className={"flex items-center text-blue-600"}>
+                    <button className={"text-lg "}>add</button>
                     <IoIosArrowForward className={"ml-1"}/>
                 </div>
             </div>
