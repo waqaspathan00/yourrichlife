@@ -9,6 +9,7 @@ interface StepLineChartProps {
     view: string;
 }
 const StepLineChart = ({dailySavingsBalance, view}: StepLineChartProps) => {
+    const dailyAmounts = dailySavingsBalance.map((day) => day.amount);
 
     let labels;
     if (view === "1M") {
@@ -20,7 +21,6 @@ const StepLineChart = ({dailySavingsBalance, view}: StepLineChartProps) => {
     } else if (view === "1Y") {
         labels = Array.from({length: 365}, (_, i) => i + 1);
     } else if (view === "YTD") {
-        // create a variable representing the number of days that have passed in the year so far
         const daysPassed = getNumberOfDaysPassedInYear()
         labels = Array.from({length: daysPassed}, (_, i) => i + 1);
     }
@@ -31,7 +31,7 @@ const StepLineChart = ({dailySavingsBalance, view}: StepLineChartProps) => {
         datasets: [
             {
                 label: 'Step Line Data',
-                data: dailySavingsBalance,
+                data: dailyAmounts,
                 borderColor: '#3B66FF',
                 borderWidth: 2,
                 fill: true,

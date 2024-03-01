@@ -1,8 +1,9 @@
-import React, {useState, useEffect} from "react"
+import React from "react"
 import StepLineChart from "@/components/StepLineChart";
+import {DailySavingsBalance} from "@/lib/types";
 
 interface SavingsChartProps {
-    dailySavingsBalance: number[];
+    dailySavingsBalance: DailySavingsBalance[];
     selectedView: string;
     changeChartView: (view: string) => void;
 }

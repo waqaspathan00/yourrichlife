@@ -1,5 +1,6 @@
-import React, {useState, useEffect} from "react"
+import React, {useState} from "react"
 import Modal from "@/components/common/modals/Modal";
+import DatePickerTailwind from "@/components/common/DatePicker";
 
 export default function AddSavingsTransactionModal({
                                                        isAddTransactionModalOpen,
@@ -7,6 +8,7 @@ export default function AddSavingsTransactionModal({
                                                        addSavingsTransaction,
                                                        savingsGoals
                                                    }: any) {
+    const [startDate, setStartDate] = useState(new Date());
     const [amount, setAmount] = useState(0);
     const [priorityGoal, setPriorityGoal] = useState("");
     const [percentage, setPercentage] = useState(0);
@@ -15,11 +17,14 @@ export default function AddSavingsTransactionModal({
         <Modal isModalOpen={isAddTransactionModalOpen} setIsModalOpen={setIsAddTransactionModalOpen}>
             <h2 className={"text-center text-xl font-bold"}>Add Savings</h2>
             <div className={"space-y-4"}>
+                <DatePickerTailwind startDate={startDate} setStartDate={setStartDate}/>
+
                 <div className={"flex flex-col"}>
                     <label htmlFor="amount">
                         Amount
                     </label>
-                    <input className={"border-2 p-2 rounded-md"} type="number" id="amount" name="amount" placeholder={"Amount"}
+                    <input className={"border-2 p-2 rounded-md"} type="number" id="amount" name="amount"
+                           placeholder={"Amount"}
                            value={amount} onChange={(e) => setAmount(parseInt(e.target.value))}/>
                 </div>
                 <div className={"flex justify-between space-x-2"}>
