@@ -41,11 +41,19 @@ export default function CreateButtonsPane({showAddButtons, setShowAddButtons, op
 /**
  * add a toggle for results pane
  * - subscription is not working
+ * - loading toast is not triggering and going away at correct times
  * add a mix of true false and multiple choice questions
  * add a game effect ot the background of answering questions
  *  - example: a shark eating a submarine, get away from the shark
  *  -
- *  - if everyone clicks on the correct icon displayed by the cabin
  * - look up gimkit and implement from there
  * - look up kahoot pro
+ *
+ * - in a group of 10 people:
+ *  - one person gets a question on their screen
+ *  - everyone else gets shown the answer choices
+ *  - everyone else must yell out their answer choices
+ *  - the person with the question must choose the answer that they think is correct
+ *  -
+ *
  */

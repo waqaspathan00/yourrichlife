@@ -5,3 +5,14 @@
 * {
     font-family: "Outfit", sans-serif;
 }
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.disable-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE and Edge */
+.disable-scroll {
+    -ms-overflow-style: none;
+    scrollbar-width: none; /* Firefox */
+}

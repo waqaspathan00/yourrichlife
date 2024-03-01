@@ -29,14 +29,33 @@ import {mockSavingsData} from "@/lib/utils";
  * - add file image upload for savings goals
  *      - save the image to firebase storage
  * - add ability to read a csv file of savings data and transform it into the data array
- * - add proper savings tracking over time logic
- *      - we may have to change the data array to be an array of objects with a date and amount saved
- * - save the data array to firebase
  * - add a sign in screen
  * - add a remaining funds to be distributed to savings goals
  * - add a delete button to savings goals
  * - make savings goals editable
  * - add tooltip on hover to chart to show amount and date
+
+ * - add a circular progress bar to the savings goals
+ * - plaid integration
+ * - user should be able to deposit savings into different accounts
+ *
+ * PRIORITIES:
+ * - move state variables into a context
+ *      - modal
+ *      - savings goals
+ *      - total saved
+ *      - data array
+ *      - selected view
+ * - savings tracking logic:
+ *   - the array holding the savings data will be called "savingBalancesPerDay"
+ *   - save the data array to firebase
+ *   - the array will be updated every time a deposit or withdrawal is made
+ *   - the array will be used to generate the chart
+ *   - totalSaved will be the last element in the array
+ *   - each time the user visits the application, check what day it is, and if the last element in the array is not the current day, add a new element to the array with the same value as the last element
+ *   - if the last element in the array is the current day, do nothing
+ *   - if the user makes a deposit or withdrawal, add a new element to the array with the same value as the last element
+ *
  *
  * @constructor
  */
@@ -62,7 +81,6 @@ export default function Home() {
             // }
         ]
     );
-    const [totalSaved, setTotalSaved] = useState(0);
     const [selectedView, setSelectedView] = useState('3M'); // Default view
     const [data, setData] = useState(
         [1000, 1020, 1040, 1060, 1090, 1070,
@@ -70,12 +88,14 @@ export default function Home() {
             1260, 1300, 1330, 1360, 1400, 1380,
             1430, 1460, 1500, 1530, 1570, 1600,
             1640, 1670, 1710, 1750, 1730, 1780]); // Example data array
-    const [showAddButtons, setShowAddButtons] = useState(false);
+    // totalSaved will be the last element in the data array
+    const [totalSaved, setTotalSaved] = useState(data[data.length - 1]);
 
     useEffect(() => {
         const fetchData = async () => {
             const savingsData = await getSavingsData();
-            setTotalSaved(savingsData?.totalSaved ? savingsData.totalSaved : 0);
+            // setTotalSaved(savingsData?.totalSaved ? savingsData.totalSaved : 0);
+            setTotalSaved(data[data.length - 1])
             setSavingsGoals(savingsData?.savingsGoals ? savingsData.savingsGoals : []);
         }
 
@@ -148,9 +168,9 @@ export default function Home() {
             return data.slice(data.length - 90);
         } else if (view === '6M') {
             return data.slice(data.length - 180);
-        } else if (view === 'YTD') {
-            return data.slice(data.length - 365);
         } else if (view === '1Y') {
+            return data.slice(data.length - 365);
+        } else if (view === 'YTD') {
             return data.slice(data.length - 365);
         }
     }
@@ -165,7 +185,7 @@ export default function Home() {
     }
 
     return (
-        <main className="flex flex-col items-center bg-gray-100 h-screen relative">
+        <main className="flex flex-col items-center bg-gray-100 relative disable-scroll">
             <Header totalSaved={totalSaved}/>
             <SavingsChart data={data} selectedView={selectedView} changeChartView={changeChartView}/>
             <DepositButton openAddSavingsModal={openAddSavingsModal}/>
