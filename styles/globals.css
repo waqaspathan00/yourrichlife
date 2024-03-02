@@ -6,6 +6,10 @@
     font-family: "Outfit", sans-serif;
 }
 
+body {
+    background-color: rgb(243 244 246);
+}
+
 /* Hide scrollbar for Chrome, Safari and Opera */
 .disable-scroll::-webkit-scrollbar {
     display: none;

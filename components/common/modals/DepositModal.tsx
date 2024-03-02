@@ -49,7 +49,7 @@ export default function DepositModal({
                                onChange={(e) => setPercentage(parseInt(e.target.value))}/>
                     </div>
                 </div>
-                <button className={"bg-blue-600 w-full rounded-full p-2 text-white"}
+                <button className={"bg-blue-600 w-full rounded-full text-lg p-4 text-white"}
                         onClick={() => addSavingsTransaction(savingsDate, amount, priorityGoal, percentage)}
                         type="submit">
                     Deposit

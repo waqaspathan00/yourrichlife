@@ -203,7 +203,7 @@ export default function Home() {
     }
 
     return (
-        <main className="flex flex-col items-center bg-gray-100 relative disable-scroll">
+        <main className="flex flex-col items-center relative disable-scroll">
             <Header totalSaved={totalSaved}/>
             <SavingsChart dailySavingsBalance={dailySavingsBalanceChartData} selectedView={selectedView}
                           changeChartView={changeChartView}/>
