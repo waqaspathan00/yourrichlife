@@ -1473,3 +1473,11 @@ export const getNumberOfDaysPassedInYear = () => {
     const day = Math.floor(diff / oneDay);
     return day + 1;
 }
+
+export type ViewKey = '1M' | '3M' | '6M' | '1Y' | 'YTD';
+export const viewToDaysMap = {
+    "1M": 30,
+    "3M": 90,
+    "6M": 180,
+    "1Y": 365,
+};

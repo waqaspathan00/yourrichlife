@@ -1,11 +1,12 @@
 import React from "react"
 import StepLineChart from "@/components/StepLineChart";
 import {DailySavingsBalance} from "@/lib/types";
+import {ViewKey} from "@/lib/utils";
 
 interface SavingsChartProps {
     dailySavingsBalance: DailySavingsBalance[];
-    selectedView: string;
-    changeChartView: (view: string) => void;
+    selectedView: ViewKey;
+    changeChartView: (view: ViewKey) => void;
 }
 
 export default function SavingsChart({dailySavingsBalance, selectedView, changeChartView}: SavingsChartProps) {
@@ -25,9 +26,9 @@ export default function SavingsChart({dailySavingsBalance, selectedView, changeC
 }
 
 const ChangeChartViewButton = ({selectedView, changeChartView, view}: {
-    selectedView: string,
-    changeChartView: (view: string) => void,
-    view: string
+    selectedView: ViewKey,
+    changeChartView: (view: ViewKey) => void,
+    view: ViewKey
 }) => {
     return (
         <button

@@ -11,18 +11,19 @@ interface StepLineChartProps {
 const StepLineChart = ({dailySavingsBalance, view}: StepLineChartProps) => {
     const dailyAmounts = dailySavingsBalance.map((day) => day.amount);
 
+    // this block of code can be optimized
     let labels;
     if (view === "1M") {
-        labels = Array.from({length: 30}, (_, i) => i + 1);
+        labels = dailySavingsBalance.slice(dailySavingsBalance.length - 30).map((data, index) => data.date);
     } else if (view === "3M") {
-        labels = Array.from({length: 90}, (_, i) => i + 1);
+        labels = dailySavingsBalance.slice(dailySavingsBalance.length - 90).map((data, index) => data.date);
     } else if (view === "6M") {
-        labels = Array.from({length: 180}, (_, i) => i + 1);
+        labels = dailySavingsBalance.slice(dailySavingsBalance.length - 180).map((data, index) => data.date);
     } else if (view === "1Y") {
-        labels = Array.from({length: 365}, (_, i) => i + 1);
+        labels = dailySavingsBalance.slice(dailySavingsBalance.length - 365).map((data, index) => data.date);
     } else if (view === "YTD") {
         const daysPassed = getNumberOfDaysPassedInYear()
-        labels = Array.from({length: daysPassed}, (_, i) => i + 1);
+        labels = dailySavingsBalance.slice(dailySavingsBalance.length - daysPassed).map((data, index) => data.date);
     }
 
 
@@ -66,17 +67,16 @@ const StepLineChart = ({dailySavingsBalance, view}: StepLineChartProps) => {
                 // backgroundColor: '#3B66FF',
                 enabled: true,
                 intersect: false,
+                displayColors: false,
                 callbacks: {
                     title: function (tooltipItem: any) {
-                        return 'Day ' + tooltipItem[0].label;
+                        return tooltipItem[0].label;
                     },
                     label: function (context: any) {
                         let label = '';
-                        if (label) {
-                            label += ': ';
-                        }
+
                         if (context.parsed.y !== null) {
-                            label += context.parsed.x + " - " + context.parsed.y;
+                            label += "$" + context.parsed.y;
                         }
                         return label;
                     }

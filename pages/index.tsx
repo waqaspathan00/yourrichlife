@@ -8,6 +8,8 @@ import {getSavingsData, updateSavingsDoc} from "@/lib/firebase";
 import DepositButton from "@/components/DepositButton";
 import WithdrawalButton from "@/components/common/WithdrawalButton";
 import WithdrawalModal from "@/components/common/modals/WithdrawalModal";
+import {DailySavingsBalance} from "@/lib/types";
+import {getNumberOfDaysPassedInYear, ViewKey, viewToDaysMap} from "@/lib/utils";
 
 
 /**
@@ -25,8 +27,6 @@ import WithdrawalModal from "@/components/common/modals/WithdrawalModal";
  *  During this process, the user can identify a goal to prioritize and what percentage of the transaction should go to that goal
  *
  * for next time:
- * - add a withdrawal feature
- * - add a date to withdrawal/ deposit transactions
  * - add file image upload for savings goals
  *      - save the image to firebase storage
  * - add ability to read a csv file of savings data and transform it into the data array
@@ -34,7 +34,6 @@ import WithdrawalModal from "@/components/common/modals/WithdrawalModal";
  * - add a remaining funds to be distributed to savings goals
  * - add a delete button to savings goals
  * - make savings goals editable
- * - add tooltip on hover to chart to show amount and date
  * - round out goal disbursement logic, and to the nearest dollar
 
  * - add a circular progress bar to the savings goals
@@ -48,7 +47,7 @@ import WithdrawalModal from "@/components/common/modals/WithdrawalModal";
  *      - total saved
  *      - data array
  *      - selected view
- * - savings tracking logic:
+ * - savings tracking logic: (in progress)
  *   - save the data array to firebase
  *   - the array will be updated every time a deposit or withdrawal is made
  *   - the array will be used to generate the chart
@@ -83,9 +82,9 @@ export default function Home() {
             // }
         ]
     );
-    const [selectedView, setSelectedView] = useState('3M'); // Default view
-    const [dailySavingsBalanceMasterData, setDailySavingsBalanceMasterData]: any = useState([]);
-    const [dailySavingsBalanceChartData, setDailySavingsBalanceChartData] = useState([]);
+    const [selectedView, setSelectedView] = useState<ViewKey>('3M'); // Default view
+    const [dailySavingsBalanceMasterData, setDailySavingsBalanceMasterData] = useState<DailySavingsBalance[]>([]);
+    const [dailySavingsBalanceChartData, setDailySavingsBalanceChartData] = useState<DailySavingsBalance[]>([]);
     const [totalSaved, setTotalSaved] = useState(0);
 
     useEffect(() => {
@@ -97,10 +96,17 @@ export default function Home() {
                 setTotalSaved(fetchedSavingsData[fetchedSavingsData.length - 1].amount)
                 setSavingsGoals(savingsData.savingsGoals);
                 changeChartView(selectedView);
+
+                const newData = transformData(savingsData.dailySavingsBalance, selectedView);
+                setDailySavingsBalanceChartData(newData);
+                setSelectedView(selectedView);
             }
         }
 
+        // if (dailySavingsBalanceMasterData.length === 0) {
+        //     console.log('fetching data')
         fetchData();
+        // }
     }, [])
 
     const generateId = () => {
@@ -126,6 +132,18 @@ export default function Home() {
         // @ts-ignore
         setSavingsGoals(newGoals);
         setIsCreateGoalModalOpen(false);
+    }
+
+    const takeWithdrawal = (amount: number) => {
+        const newSavingsBalance = [...dailySavingsBalanceMasterData];
+        const lastElement = newSavingsBalance[newSavingsBalance.length - 1];
+        lastElement.amount -= amount;
+        const newSavingsData = {
+            dailySavingsBalance: newSavingsBalance
+        };
+        updateSavingsDoc(newSavingsData)
+        setTotalSaved(newSavingsBalance[newSavingsBalance.length - 1].amount);
+        setIsWithdrawalModalOpen(false);
     }
 
     /**
@@ -170,23 +188,18 @@ export default function Home() {
         setIsDepositModalOpen(false);
     };
 
-    const changeChartView = (view: string) => {
+    const changeChartView = (view: ViewKey) => {
         const newData = transformData(dailySavingsBalanceMasterData, view);
         setDailySavingsBalanceChartData(newData);
         setSelectedView(view);
     }
 
-    const transformData = (data: any, view: string) => {
-        if (view === '1M') {
-            return data.slice(data.length - 30);
-        } else if (view === '3M') {
-            return data.slice(data.length - 90);
-        } else if (view === '6M') {
-            return data.slice(data.length - 180);
-        } else if (view === '1Y') {
-            return data.slice(data.length - 365);
-        } else if (view === 'YTD') {
-            return data.slice(data.length - 365);
+    const transformData = (data: any, view: ViewKey) => {
+        if (view === 'YTD') {
+            return data.slice(data.length - getNumberOfDaysPassedInYear());
+        } else {
+            const days = viewToDaysMap[view];
+            return days ? data.slice(data.length - days) : data; // Fallback to returning original data if view is not recognized
         }
     }
 
@@ -215,7 +228,8 @@ export default function Home() {
 
             <DisplayGoals openCreateGoalModal={openCreateGoalModal} savingsGoals={savingsGoals}/>
 
-            <WithdrawalModal isWithdrawalModalOpen={isWithdrawalModalOpen}
+            <WithdrawalModal takeWithdrawal={takeWithdrawal}
+                             isWithdrawalModalOpen={isWithdrawalModalOpen}
                              setIsWithdrawalModalOpen={setIsWithdrawalModalOpen}/>
             <DepositModal addSavingsTransaction={addSavingsTransaction}
                           isDepositModalOpen={isDepositModalOpen}

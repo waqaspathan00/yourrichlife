@@ -2,9 +2,10 @@ import React, {useState} from "react"
 import Modal from "@/components/common/modals/Modal";
 
 export default function WithdrawalModal({
-                                         isWithdrawalModalOpen,
-                                         setIsWithdrawalModalOpen,
-                                     }: any) {
+                                            takeWithdrawal,
+                                            isWithdrawalModalOpen,
+                                            setIsWithdrawalModalOpen,
+                                        }: any) {
     const [amount, setAmount] = useState(0);
 
     return (
@@ -20,7 +21,7 @@ export default function WithdrawalModal({
                            value={amount} onChange={(e) => setAmount(parseInt(e.target.value))}/>
                 </div>
                 <button className={"bg-blue-600 w-full rounded-full p-4 text-lg text-white"}
-                        // onClick={() => addSavingsTransaction(amount)}
+                    onClick={() => takeWithdrawal(amount)}
                         type="submit">
                     Withdraw
                 </button>
