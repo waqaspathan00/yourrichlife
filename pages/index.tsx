@@ -8,7 +8,7 @@ import {getSavingsData, updateSavingsDoc} from "@/lib/firebase";
 import DepositButton from "@/components/DepositButton";
 import WithdrawalButton from "@/components/common/WithdrawalButton";
 import WithdrawalModal from "@/components/common/modals/WithdrawalModal";
-import {DailySavingsBalance} from "@/lib/types";
+import {DailySavingsBalance, Goal} from "@/lib/types";
 import {getNumberOfDaysPassedInYear, ViewKey, viewToDaysMap} from "@/lib/utils";
 
 
@@ -64,7 +64,11 @@ export default function Home() {
     const [createGoalModalType, setCreateGoalModalType] = useState('');
     const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
     const [isWithdrawalModalOpen, setIsWithdrawalModalOpen] = useState(false);
-    const [savingsGoals, setSavingsGoals] = useState(
+
+    const [totalSaved, setTotalSaved] = useState(0);
+    const [dailySavingsBalanceMasterData, setDailySavingsBalanceMasterData] = useState<DailySavingsBalance[]>([]);
+    const [dailySavingsBalanceChartData, setDailySavingsBalanceChartData] = useState<DailySavingsBalance[]>([]);
+    const [savingsGoals, setSavingsGoals] = useState<Goal[]>(
         [
             // {
             //     "type": "necessities",
@@ -83,9 +87,7 @@ export default function Home() {
         ]
     );
     const [selectedView, setSelectedView] = useState<ViewKey>('3M'); // Default view
-    const [dailySavingsBalanceMasterData, setDailySavingsBalanceMasterData] = useState<DailySavingsBalance[]>([]);
-    const [dailySavingsBalanceChartData, setDailySavingsBalanceChartData] = useState<DailySavingsBalance[]>([]);
-    const [totalSaved, setTotalSaved] = useState(0);
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -226,7 +228,7 @@ export default function Home() {
                 <DepositButton openDepositModal={openDepositModal}/>
             </div>
 
-            <DisplayGoals openCreateGoalModal={openCreateGoalModal} savingsGoals={savingsGoals}/>
+            <DisplayGoals openCreateGoalModal={openCreateGoalModal} savingsGoals={savingsGoals} setSavingsGoals={setSavingsGoals}/>
 
             <WithdrawalModal takeWithdrawal={takeWithdrawal}
                              isWithdrawalModalOpen={isWithdrawalModalOpen}

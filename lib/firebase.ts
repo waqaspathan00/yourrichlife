@@ -5,6 +5,7 @@ import {signOut} from "@firebase/auth";
 import toast from "react-hot-toast";
 import {NextRouter} from "next/router";
 import {doc, getDoc, updateDoc} from "@firebase/firestore";
+import {Goal} from "@/lib/types";
 
 const firebaseConfig = JSON.parse(process.env.NEXT_PUBLIC_FIREBASE_CONFIG as string);
 
@@ -35,4 +36,11 @@ export const getSavingsData = async () => {
     const savingsDocRef = doc(db, "savings", "wadia");
     const savingsDoc = await getDoc(savingsDocRef);
     return savingsDoc.data();
+}
+
+export const deleteGoal = async (id: number) => {
+    const savingsData = await getSavingsData();
+    const newGoals = savingsData?.savingsGoals.filter((goal: Goal) => goal.id !== id);
+    await updateSavingsDoc({savingsGoals: newGoals});
+    return newGoals;
 }

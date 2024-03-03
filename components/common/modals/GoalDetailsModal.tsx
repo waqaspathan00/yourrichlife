@@ -5,11 +5,12 @@ import React from "react";
 
 interface GoalDetailsModalProps {
     goal: Goal;
+    handleDeleteGoal: (id: number) => void;
     isGoalDetailsModalOpen: boolean;
     setIsGoalDetailsModalOpen: (isGoalDetailsModalOpen: boolean) => void;
 }
 
-export default function GoalDetailsModal({goal, isGoalDetailsModalOpen, setIsGoalDetailsModalOpen}: GoalDetailsModalProps) {
+export default function GoalDetailsModal({goal, handleDeleteGoal, isGoalDetailsModalOpen, setIsGoalDetailsModalOpen}: GoalDetailsModalProps) {
     return (
         <Modal isModalOpen={isGoalDetailsModalOpen} setIsModalOpen={setIsGoalDetailsModalOpen}>
             <div className={"flex flex-col items-center"}>
@@ -24,7 +25,7 @@ export default function GoalDetailsModal({goal, isGoalDetailsModalOpen, setIsGoa
                         <p>${goal.amountTarget}</p>
                     </div>
                 </div>
-                <button onClick={() => setIsGoalDetailsModalOpen(false)}>Close</button>
+                <button onClick={() => handleDeleteGoal(goal.id)}>Delete</button>
             </div>
         </Modal>
     )

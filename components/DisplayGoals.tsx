@@ -1,17 +1,18 @@
 import React, {useState, useEffect} from "react"
 import ProgressBar from "@/components/ProgressBar";
-import Modal from "@/components/common/modals/Modal";
 import {BsTriangleFill} from "react-icons/bs";
 import {IoIosArrowForward} from "react-icons/io";
 import {Goal} from "@/lib/types";
 import GoalDetailsModal from "@/components/common/modals/GoalDetailsModal";
+import {deleteGoal} from "@/lib/firebase";
 
 interface DisplayGoalsProps {
     openCreateGoalModal: (e: any) => void;
-    savingsGoals: Goal[]
+    savingsGoals: Goal[],
+    setSavingsGoals: (savingsGoals: Goal[]) => void
 }
 
-export default function DisplayGoals({openCreateGoalModal, savingsGoals}: DisplayGoalsProps) {
+export default function DisplayGoals({openCreateGoalModal, savingsGoals, setSavingsGoals}: DisplayGoalsProps) {
     const [displayNecessities, setDisplayNecessities] = useState(true);
     const [displayWants, setDisplayWants] = useState(true);
 
@@ -24,26 +25,18 @@ export default function DisplayGoals({openCreateGoalModal, savingsGoals}: Displa
     }
 
     return (
-        <>
-            <div className={"flex flex-col w-full items-center"}>
-                <h2 className={"text-3xl text-left w-11/12 font-bold"}>Goals</h2>
+        <div className={"flex flex-col w-full items-center"}>
+            <h2 className={"text-3xl text-left w-11/12 font-bold"}>Goals</h2>
 
-                {savingsGoals.length === 0
-                    ? <p className={"text-gray-500"}>No goals yet</p>
-                    : (
-                        <>
-                            <DisplayGoalsType goalDisplayType={"necessities"} displayGoals={displayNecessities}
-                                              toggleGoalsDisplay={toggleGoalsDisplay} savingsGoals={savingsGoals}
-                                              openCreateGoalModal={openCreateGoalModal}/>
-                            <DisplayGoalsType goalDisplayType={"wants"} displayGoals={displayWants}
-                                              toggleGoalsDisplay={toggleGoalsDisplay} savingsGoals={savingsGoals}
-                                              openCreateGoalModal={openCreateGoalModal}/>
-                        </>
-                    )
-                }
-
-            </div>
-        </>
+            <DisplayGoalsType goalDisplayType={"necessities"} displayGoals={displayNecessities}
+                              toggleGoalsDisplay={toggleGoalsDisplay} savingsGoals={savingsGoals}
+                              setSavingsGoals={setSavingsGoals}
+                              openCreateGoalModal={openCreateGoalModal}/>
+            <DisplayGoalsType goalDisplayType={"wants"} displayGoals={displayWants}
+                              toggleGoalsDisplay={toggleGoalsDisplay} savingsGoals={savingsGoals}
+                              setSavingsGoals={setSavingsGoals}
+                              openCreateGoalModal={openCreateGoalModal}/>
+        </div>
     )
 }
 
@@ -52,6 +45,7 @@ interface DisplayGoalsTypeProps {
     displayGoals: boolean;
     toggleGoalsDisplay: (type: string) => void;
     savingsGoals: Goal[],
+    setSavingsGoals: (savingsGoals: Goal[]) => void
     openCreateGoalModal: (goalDisplayType: string) => void;
 }
 
@@ -60,9 +54,17 @@ const DisplayGoalsType = ({
                               displayGoals,
                               toggleGoalsDisplay,
                               savingsGoals,
+                              setSavingsGoals,
                               openCreateGoalModal
                           }: DisplayGoalsTypeProps) => {
     const goalDisplayText = goalDisplayType.charAt(0).toUpperCase() + goalDisplayType.slice(1);
+    const filteredGoals = savingsGoals.filter((goal) => goal.type === goalDisplayType);
+
+
+    const handleDeleteGoal = async (id: number) => {
+        const updatedSavingsGoals = await deleteGoal(id)
+        setSavingsGoals(updatedSavingsGoals);
+    }
 
     return (
         <>
@@ -81,27 +83,35 @@ const DisplayGoalsType = ({
                     <IoIosArrowForward className={"ml-1"}/>
                 </div>
             </div>
-            <div className={"flex w-full justify-around flex-wrap"}>
-                {displayGoals && savingsGoals.filter((goal => goal.type === goalDisplayType)).map((goal) => (
-                    <GoalCard goal={goal}/>
-                ))}
+            <div className={"flex flex-col w-11/12"}>
+                {displayGoals && (
+                    filteredGoals.length === 0
+                        ?
+                        <p onClick={() => openCreateGoalModal(goalDisplayType)}
+                           className={"text-gray-500 w-full text-center cursor-pointer border-dashed border-2 rounded-lg border-gray-300 p-4"}>
+                            Add a goal here</p>
+                        : filteredGoals.map((goal) => (
+                            <GoalCard goal={goal} handleDeleteGoal={handleDeleteGoal}/>
+                        ))
+                )}
             </div>
         </>
     )
 }
 
 interface GoalCardProps {
-    goal: Goal
+    goal: Goal,
+    handleDeleteGoal: (id: number) => void
 }
 
-const GoalCard = ({goal}: GoalCardProps) => {
+const GoalCard = ({goal, handleDeleteGoal}: GoalCardProps) => {
     const [isGoalDetailsModalOpen, setIsGoalDetailsModalOpen] = useState(false);
 
     return (
         <>
             <li key={goal.name}
                 onClick={() => setIsGoalDetailsModalOpen(true)}
-                className={"flex flex-col w-full m-2 p-4 bg-white cursor-pointer rounded-xl"}>
+                className={"flex flex-col w-full my-2 p-4 bg-white cursor-pointer rounded-xl"}>
 
                 <div className={"flex items-center"}>
                     {goal.imageUrl &&
@@ -120,8 +130,8 @@ const GoalCard = ({goal}: GoalCardProps) => {
                     </div>
                 </div>
 
-                {/*<button onClick={() => setIsGoalDetailsModalOpen(true)}>View</button>*/}
-                <GoalDetailsModal goal={goal} isGoalDetailsModalOpen={isGoalDetailsModalOpen}
+                <GoalDetailsModal handleDeleteGoal={handleDeleteGoal} goal={goal}
+                                  isGoalDetailsModalOpen={isGoalDetailsModalOpen}
                                   setIsGoalDetailsModalOpen={setIsGoalDetailsModalOpen}/>
             </li>
         </>
