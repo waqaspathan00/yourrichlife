@@ -13,6 +13,7 @@ import {getNumberOfDaysPassedInYear, ViewKey, viewToDaysMap} from "@/lib/utils";
 import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
 import UndistributedFundsAlert from "@/components/UndistributedFundsAlert";
 import DistributeFundsModal from "@/components/common/modals/DistributeFundsModal";
+import EmojiPickerModal from "@/components/common/modals/EmojiPickerModal";
 
 
 /**

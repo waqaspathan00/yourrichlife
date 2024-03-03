@@ -11,6 +11,8 @@ interface ModalOpenContextProps {
     setIsWithdrawalModalOpen: (isWithdrawalModalOpen: boolean) => void;
     isDistributeFundsModalOpen: boolean;
     setIsDistributeFundsModalOpen: (isDistributeFundsModalOpen: boolean) => void;
+    isEmojiPickerModalOpen: boolean;
+    setIsEmojiPickerModalOpen: (isEmojiPickerModalOpen: boolean) => void;
 }
 
 export const ModalOpenContext = createContext<ModalOpenContextProps>({
@@ -28,6 +30,9 @@ export const ModalOpenContext = createContext<ModalOpenContextProps>({
     },
     isDistributeFundsModalOpen: false,
     setIsDistributeFundsModalOpen: () => {
+    },
+    isEmojiPickerModalOpen: false,
+    setIsEmojiPickerModalOpen: () => {
     }
 })
 
@@ -41,6 +46,7 @@ export const ModalOpenProvider = ({children}: ModalOpenProviderProps) => {
     const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
     const [isWithdrawalModalOpen, setIsWithdrawalModalOpen] = useState(false);
     const [isDistributeFundsModalOpen, setIsDistributeFundsModalOpen] = useState(false);
+    const [isEmojiPickerModalOpen, setIsEmojiPickerModalOpen] = useState(false);
 
     return (
         <ModalOpenContext.Provider value={{
@@ -53,7 +59,9 @@ export const ModalOpenProvider = ({children}: ModalOpenProviderProps) => {
             isWithdrawalModalOpen,
             setIsWithdrawalModalOpen,
             isDistributeFundsModalOpen,
-            setIsDistributeFundsModalOpen
+            setIsDistributeFundsModalOpen,
+            isEmojiPickerModalOpen,
+            setIsEmojiPickerModalOpen
         }}>
             {children}
         </ModalOpenContext.Provider>
