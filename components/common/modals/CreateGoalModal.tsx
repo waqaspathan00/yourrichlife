@@ -33,6 +33,10 @@ export default function CreateGoalModal() {
         // @ts-ignore
         setSavingsGoals(newGoals);
         setIsCreateGoalModalOpen(false);
+
+        setName("");
+        setAmount(0);
+        setImageUrl("");
     }
 
     return (

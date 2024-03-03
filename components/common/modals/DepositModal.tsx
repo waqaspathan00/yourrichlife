@@ -7,7 +7,7 @@ import {ModalOpenContext} from "@/lib/context/ModalOpenContext";
 
 export default function DepositModal() {
     const {isDepositModalOpen, setIsDepositModalOpen} = useContext(ModalOpenContext)
-    const {dailySavingsBalanceMasterData, setTotalSaved, savingsGoals} = useContext(SavingsDataContext);
+    const {dailySavingsBalanceMasterData, setTotalSaved, savingsGoals, setSavingsGoals} = useContext(SavingsDataContext);
     const [savingsDate, setSavingsDate] = useState(new Date());
     const [amount, setAmount] = useState("");
     const [priorityGoal, setPriorityGoal] = useState("");
@@ -50,8 +50,10 @@ export default function DepositModal() {
             dailySavingsBalance: newSavingsBalance,
             savingsGoals: updatedSavingsGoals
         };
+
         updateSavingsDoc(newSavingsData)
         setTotalSaved(newSavingsBalance[newSavingsBalance.length - 1].amount);
+        setSavingsGoals(updatedSavingsGoals);
         setIsDepositModalOpen(false);
     };
 
