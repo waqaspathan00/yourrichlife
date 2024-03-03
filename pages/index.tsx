@@ -20,12 +20,6 @@ import DistributeFundsModal from "@/components/common/modals/DistributeFundsModa
  * this application will be a savings tracking application to help users save money
  * the concept of it revolves around the idea of saving money instead of spending it, specifically on things that are not necessary/ impulse purchases
  *
- * on the homepage the user will see:
- *  - their total amount saved so far
- *  - a list of their savings goals
- *  - a button to add a new savings goal
- *  - a button to add a new savings transaction
- *
  *  When the user adds a new savings transaction, the amount of that transaction will be distributed to the savings goals that the user has set up
  *  During this process, the user can identify a goal to prioritize and what percentage of the transaction should go to that goal
  *
@@ -34,8 +28,6 @@ import DistributeFundsModal from "@/components/common/modals/DistributeFundsModa
  *      - save the image to firebase storage
  * - add ability to read a csv file of savings data and transform it into the data array
  * - add a sign in screen
- * - add a remaining funds to be distributed to savings goals
- * - add a delete button to savings goals
  * - make savings goals editable
  * - round out goal disbursement logic, and to the nearest dollar
 
@@ -52,13 +44,6 @@ import DistributeFundsModal from "@/components/common/modals/DistributeFundsModa
  *   - each time the user visits the application, check what day it is, and if the last element in the array is not the current day, add a new element to the array with the same value as the last element
  *   - if the last element in the array is the current day, do nothing
  *   - if the user makes a deposit or withdrawal, add a new element to the array with the same value as the last element
- *
- * - track undistributed funds
- *   - when the user makes a deposit, the savings will be distributed to the savings goals
- *   - but there may be savings in the account that are undistributed
- *   - the user should be able to see how much money is undistributed
- *   - the user should be able to distribute the undistributed funds to the savings goals by clicking a button in
- *
  *
  * @constructor
  */

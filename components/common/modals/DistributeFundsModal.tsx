@@ -12,17 +12,29 @@ export default function DistributeFundsModal() {
     const [percentage, setPercentage] = useState("");
 
     const handleDistributeFunds = () => {
-        const totalAmountToDistribute = parseInt(amount);
+        let totalAmountToDistribute = parseInt(amount);
         const priorityPercentage = parseInt(percentage) / 100;
-        const priorityAmountToDistribute = totalAmountToDistribute * priorityPercentage;
-        const remainingAmountToDistribute = totalAmountToDistribute - priorityAmountToDistribute;
+        const priorityDistributionAmount = totalAmountToDistribute * priorityPercentage;
+        const postPriorityDistributionAmount = totalAmountToDistribute - priorityDistributionAmount;
 
         const numNonPriorityGoals = savingsGoals.filter((goal: any) => goal.name !== priorityGoal).length;
-        const amountPerGoal = remainingAmountToDistribute / numNonPriorityGoals;
+        const amountPerGoal = postPriorityDistributionAmount / numNonPriorityGoals;
         const updatedSavingsGoals = savingsGoals.map((goal: any) => {
             if (goal.name === priorityGoal) {
-                return {...goal, amountSaved: goal.amountSaved + priorityAmountToDistribute};
+                if (goal.amountSaved + priorityDistributionAmount > goal.amountTarget) {
+                    totalAmountToDistribute -= (goal.amountTarget - goal.amountSaved);
+                    console.log("totalAmountToDistribute", totalAmountToDistribute)
+                    return {...goal, amountSaved: goal.amountTarget};
+                }
+                totalAmountToDistribute -= priorityDistributionAmount;
+                return {...goal, amountSaved: goal.amountSaved + priorityDistributionAmount};
             } else {
+                // ensure that the addition of the non-priority distribution amount does not exceed the target amount of the goal
+                if (goal.amountSaved + amountPerGoal > goal.amountTarget) {
+                    totalAmountToDistribute -= (goal.amountTarget - goal.amountSaved);
+                    return {...goal, amountSaved: goal.amountTarget};
+                }
+                totalAmountToDistribute -= amountPerGoal;
                 return {...goal, amountSaved: goal.amountSaved + amountPerGoal};
             }
         });
@@ -31,7 +43,7 @@ export default function DistributeFundsModal() {
             savingsGoals: updatedSavingsGoals
         };
 
-        const updatedUndistributedFunds = undistributedFunds - totalAmountToDistribute;
+        const updatedUndistributedFunds = undistributedFunds - (parseInt(amount) - totalAmountToDistribute)
 
         updateSavingsDoc(newSavingsData)
         setSavingsGoals(updatedSavingsGoals);
