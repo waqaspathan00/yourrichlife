@@ -1,31 +1,25 @@
-import React, {useState} from 'react';
+import React, {useContext} from 'react';
 import 'chart.js/auto';
 import {Line} from 'react-chartjs-2';
-import {getNumberOfDaysPassedInYear} from "@/lib/utils";
-import {DailySavingsBalance} from "@/lib/types";
+import {getNumberOfDaysPassedInYear, ViewKey, viewToDaysMap} from "@/lib/utils";
+import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
 
 interface StepLineChartProps {
-    dailySavingsBalance: DailySavingsBalance[];
-    view: string;
+    view: ViewKey;
 }
-const StepLineChart = ({dailySavingsBalance, view}: StepLineChartProps) => {
-    const dailyAmounts = dailySavingsBalance.map((day) => day.amount);
+
+const StepLineChart = ({view}: StepLineChartProps) => {
+    const {dailySavingsBalanceChartData} = useContext(SavingsDataContext);
+    const dailyAmounts = dailySavingsBalanceChartData.map((day) => day.amount);
 
     // this block of code can be optimized
     let labels;
-    if (view === "1M") {
-        labels = dailySavingsBalance.slice(dailySavingsBalance.length - 30).map((data, index) => data.date);
-    } else if (view === "3M") {
-        labels = dailySavingsBalance.slice(dailySavingsBalance.length - 90).map((data, index) => data.date);
-    } else if (view === "6M") {
-        labels = dailySavingsBalance.slice(dailySavingsBalance.length - 180).map((data, index) => data.date);
-    } else if (view === "1Y") {
-        labels = dailySavingsBalance.slice(dailySavingsBalance.length - 365).map((data, index) => data.date);
-    } else if (view === "YTD") {
-        const daysPassed = getNumberOfDaysPassedInYear()
-        labels = dailySavingsBalance.slice(dailySavingsBalance.length - daysPassed).map((data, index) => data.date);
+    if (view === 'YTD') {
+        labels = dailySavingsBalanceChartData.slice(dailySavingsBalanceChartData.length - getNumberOfDaysPassedInYear()).map((day) => day.date);
+    } else {
+        const dayCount = viewToDaysMap[view];
+        labels = dailySavingsBalanceChartData.slice(dailySavingsBalanceChartData.length - dayCount).map((day) => day.date);
     }
-
 
     const chartData: any = {
         labels: labels,

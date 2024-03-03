@@ -9,6 +9,8 @@ interface ModalOpenContextProps {
     setIsDepositModalOpen: (isDepositModalOpen: boolean) => void;
     isWithdrawalModalOpen: boolean;
     setIsWithdrawalModalOpen: (isWithdrawalModalOpen: boolean) => void;
+    isDistributeFundsModalOpen: boolean;
+    setIsDistributeFundsModalOpen: (isDistributeFundsModalOpen: boolean) => void;
 }
 
 export const ModalOpenContext = createContext<ModalOpenContextProps>({
@@ -23,6 +25,9 @@ export const ModalOpenContext = createContext<ModalOpenContextProps>({
     },
     isWithdrawalModalOpen: false,
     setIsWithdrawalModalOpen: () => {
+    },
+    isDistributeFundsModalOpen: false,
+    setIsDistributeFundsModalOpen: () => {
     }
 })
 
@@ -35,6 +40,7 @@ export const ModalOpenProvider = ({children}: ModalOpenProviderProps) => {
     const [createGoalModalType, setCreateGoalModalType] = useState('');
     const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
     const [isWithdrawalModalOpen, setIsWithdrawalModalOpen] = useState(false);
+    const [isDistributeFundsModalOpen, setIsDistributeFundsModalOpen] = useState(false);
 
     return (
         <ModalOpenContext.Provider value={{
@@ -46,6 +52,8 @@ export const ModalOpenProvider = ({children}: ModalOpenProviderProps) => {
             setIsDepositModalOpen,
             isWithdrawalModalOpen,
             setIsWithdrawalModalOpen,
+            isDistributeFundsModalOpen,
+            setIsDistributeFundsModalOpen
         }}>
             {children}
         </ModalOpenContext.Provider>

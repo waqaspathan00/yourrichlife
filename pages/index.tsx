@@ -11,6 +11,8 @@ import WithdrawalModal from "@/components/common/modals/WithdrawalModal";
 import {DailySavingsBalance, Goal} from "@/lib/types";
 import {getNumberOfDaysPassedInYear, ViewKey, viewToDaysMap} from "@/lib/utils";
 import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
+import UndistributedFundsAlert from "@/components/UndistributedFundsAlert";
+import DistributeFundsModal from "@/components/common/modals/DistributeFundsModal";
 
 
 /**
@@ -42,12 +44,6 @@ import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
  * - user should be able to deposit savings into different accounts
  *
  * PRIORITIES:
- * - move state variables into a context
- *      - modal
- *      - savings goals
- *      - total saved
- *      - data array
- *      - selected view
  * - savings tracking logic: (in progress)
  *   - save the data array to firebase
  *   - the array will be updated every time a deposit or withdrawal is made
@@ -57,6 +53,12 @@ import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
  *   - if the last element in the array is the current day, do nothing
  *   - if the user makes a deposit or withdrawal, add a new element to the array with the same value as the last element
  *
+ * - track undistributed funds
+ *   - when the user makes a deposit, the savings will be distributed to the savings goals
+ *   - but there may be savings in the account that are undistributed
+ *   - the user should be able to see how much money is undistributed
+ *   - the user should be able to distribute the undistributed funds to the savings goals by clicking a button in
+ *
  *
  * @constructor
  */
@@ -64,11 +66,9 @@ export default function Home() {
     const {
         dailySavingsBalanceMasterData,
         setDailySavingsBalanceMasterData,
-        dailySavingsBalanceChartData,
         setDailySavingsBalanceChartData,
-        totalSaved,
         setTotalSaved,
-        savingsGoals,
+        setUndistributedFunds,
         setSavingsGoals
     } = useContext(SavingsDataContext);
     const [selectedView, setSelectedView] = useState<ViewKey>('3M'); // Default view
@@ -78,10 +78,16 @@ export default function Home() {
         const fetchData = async () => {
             const savingsData = await getSavingsData();
             if (savingsData) {
-                const fetchedSavingsData = savingsData.dailySavingsBalance
-                setDailySavingsBalanceMasterData(savingsData.dailySavingsBalance);
-                setTotalSaved(fetchedSavingsData[fetchedSavingsData.length - 1].amount)
-                setSavingsGoals(savingsData.savingsGoals);
+                // extract dailySavingsBalance, savingsGoals from savingsData and rename them as fetchedDailySavingsBalance, fetchedSavingsGoals
+                const {dailySavingsBalance: fetchedDailySavingsBalance, savingsGoals: fetchedSavingsGoals} = savingsData;
+                const lastElement = fetchedDailySavingsBalance[fetchedDailySavingsBalance.length - 1];
+                const currentSavingsAmount = lastElement.amount;
+                const undistributedFunds = currentSavingsAmount - fetchedSavingsGoals.reduce((acc: number, goal: Goal) => acc + goal.amountSaved, 0);
+
+                setDailySavingsBalanceMasterData(fetchedDailySavingsBalance);
+                setTotalSaved(currentSavingsAmount)
+                setUndistributedFunds(undistributedFunds);
+                setSavingsGoals(fetchedSavingsGoals);
                 changeChartView(selectedView);
 
                 const newData = transformData(savingsData.dailySavingsBalance, selectedView);
@@ -90,10 +96,7 @@ export default function Home() {
             }
         }
 
-        // if (dailySavingsBalanceMasterData.length === 0) {
-        //     console.log('fetching data')
         fetchData();
-        // }
     }, [])
 
 
@@ -115,7 +118,7 @@ export default function Home() {
     return (
         <main className="flex flex-col items-center relative disable-scroll">
             <Header/>
-            <SavingsChart dailySavingsBalance={dailySavingsBalanceChartData} selectedView={selectedView}
+            <SavingsChart selectedView={selectedView}
                           changeChartView={changeChartView}/>
 
             <div className={"flex w-11/12 my-4 space-x-4"}>
@@ -123,11 +126,21 @@ export default function Home() {
                 <DepositButton/>
             </div>
 
-            <DisplayGoals/>
+            <UndistributedFundsAlert />
 
-            <WithdrawalModal/>
-            <DepositModal/>
-            <CreateGoalModal/>
+            <DisplayGoals/>
+            <DisplayModals/>
         </main>
     );
+}
+
+const DisplayModals = () => {
+    return (
+        <>
+            <DepositModal/>
+            <WithdrawalModal/>
+            <CreateGoalModal/>
+            <DistributeFundsModal/>
+        </>
+    )
 }

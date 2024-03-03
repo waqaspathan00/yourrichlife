@@ -22,7 +22,7 @@ export default function DepositModal() {
         const newSavingsBalance = [...dailySavingsBalanceMasterData];
         const lastElement = newSavingsBalance[newSavingsBalance.length - 1];
         const formattedDate = savingsDate.toLocaleDateString();
-        if (lastElement.date !== formattedDate) {
+        if (lastElement.date !== formattedDate) {  // this logic is flawed right now
             newSavingsBalance.push({date: formattedDate, amount: lastElement.amount});
             if (newSavingsBalance.length > 365) {
                 newSavingsBalance.shift();
@@ -91,7 +91,7 @@ export default function DepositModal() {
                                onChange={(e) => setPercentage(e.target.value)}/>
                     </div>
                 </div>
-                <button className={"bg-blue-600 w-full rounded-full text-lg p-4 text-white"}
+                <button className={"bg-blue-600 w-full rounded-full text-lg p-2 text-white"}
                         onClick={() => addSavingsTransaction(savingsDate, amount, priorityGoal, percentage)}
                         type="submit">
                     Deposit
