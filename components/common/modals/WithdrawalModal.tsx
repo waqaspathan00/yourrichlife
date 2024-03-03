@@ -1,12 +1,26 @@
-import React, {useState} from "react"
+import React, {useContext, useState} from "react"
 import Modal from "@/components/common/modals/Modal";
+import {updateSavingsDoc} from "@/lib/firebase";
+import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
+import {ModalOpenContext} from "@/lib/context/ModalOpenContext";
 
-export default function WithdrawalModal({
-                                            takeWithdrawal,
-                                            isWithdrawalModalOpen,
-                                            setIsWithdrawalModalOpen,
-                                        }: any) {
+export default function WithdrawalModal() {
+    const {dailySavingsBalanceMasterData, setTotalSaved} = useContext(SavingsDataContext);
+    const {isWithdrawalModalOpen, setIsWithdrawalModalOpen} = useContext(ModalOpenContext);
     const [amount, setAmount] = useState(0);
+
+
+    const takeWithdrawal = (amount: number) => {
+        const newSavingsBalance = [...dailySavingsBalanceMasterData];
+        const lastElement = newSavingsBalance[newSavingsBalance.length - 1];
+        lastElement.amount -= amount;
+        const newSavingsData = {
+            dailySavingsBalance: newSavingsBalance
+        };
+        updateSavingsDoc(newSavingsData)
+        setTotalSaved(newSavingsBalance[newSavingsBalance.length - 1].amount);
+        setIsWithdrawalModalOpen(false);
+    }
 
     return (
         <Modal isModalOpen={isWithdrawalModalOpen} setIsModalOpen={setIsWithdrawalModalOpen}>

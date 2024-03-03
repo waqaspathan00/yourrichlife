@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import CreateGoalModal from "@/components/common/modals/CreateGoalModal";
 import DepositModal from "@/components/common/modals/DepositModal";
 import Header from "@/components/Header";
@@ -10,6 +10,7 @@ import WithdrawalButton from "@/components/common/WithdrawalButton";
 import WithdrawalModal from "@/components/common/modals/WithdrawalModal";
 import {DailySavingsBalance, Goal} from "@/lib/types";
 import {getNumberOfDaysPassedInYear, ViewKey, viewToDaysMap} from "@/lib/utils";
+import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
 
 
 /**
@@ -60,32 +61,16 @@ import {getNumberOfDaysPassedInYear, ViewKey, viewToDaysMap} from "@/lib/utils";
  * @constructor
  */
 export default function Home() {
-    const [isCreateGoalModalOpen, setIsCreateGoalModalOpen] = useState(false);
-    const [createGoalModalType, setCreateGoalModalType] = useState('');
-    const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
-    const [isWithdrawalModalOpen, setIsWithdrawalModalOpen] = useState(false);
-
-    const [totalSaved, setTotalSaved] = useState(0);
-    const [dailySavingsBalanceMasterData, setDailySavingsBalanceMasterData] = useState<DailySavingsBalance[]>([]);
-    const [dailySavingsBalanceChartData, setDailySavingsBalanceChartData] = useState<DailySavingsBalance[]>([]);
-    const [savingsGoals, setSavingsGoals] = useState<Goal[]>(
-        [
-            // {
-            //     "type": "necessities",
-            //     "imageUrl": "https://pictures.dealer.com/generic--OEM_VIN_STOCK_PHOTOS/8184fecc2b4e3f725c098692df721e13.jpg?impolicy=downsize_bkpt&imdensity=1&w=520",
-            //     "name": "Subaru Outback",
-            //     "amountTarget": 1000,
-            //     "amountSaved": 500
-            // },
-            // {
-            //     "type": "wants",
-            //     "imageUrl": "https://i.ebayimg.com/images/g/ExIAAOSwIyxhpCpv/s-l1200.webp",
-            //     "name": "Wedding Suit",
-            //     "amountTarget": 200,
-            //     "amountSaved": 0
-            // }
-        ]
-    );
+    const {
+        dailySavingsBalanceMasterData,
+        setDailySavingsBalanceMasterData,
+        dailySavingsBalanceChartData,
+        setDailySavingsBalanceChartData,
+        totalSaved,
+        setTotalSaved,
+        savingsGoals,
+        setSavingsGoals
+    } = useContext(SavingsDataContext);
     const [selectedView, setSelectedView] = useState<ViewKey>('3M'); // Default view
 
 
@@ -111,84 +96,6 @@ export default function Home() {
         // }
     }, [])
 
-    const generateId = () => {
-        return Math.floor(Math.random() * 1000000);
-    }
-
-    const createSavingsGoal = (name: string, amount: number, imageUrl: string) => {
-        const newGoal = {
-            id: generateId(),
-            type: createGoalModalType,
-            imageUrl,
-            name,
-            amountTarget: amount,
-            amountSaved: 0,
-        };
-        const newGoals = [...savingsGoals, newGoal];
-
-        const newSavingsData = {
-            savingsGoals: newGoals
-        };
-        updateSavingsDoc(newSavingsData)
-
-        // @ts-ignore
-        setSavingsGoals(newGoals);
-        setIsCreateGoalModalOpen(false);
-    }
-
-    const takeWithdrawal = (amount: number) => {
-        const newSavingsBalance = [...dailySavingsBalanceMasterData];
-        const lastElement = newSavingsBalance[newSavingsBalance.length - 1];
-        lastElement.amount -= amount;
-        const newSavingsData = {
-            dailySavingsBalance: newSavingsBalance
-        };
-        updateSavingsDoc(newSavingsData)
-        setTotalSaved(newSavingsBalance[newSavingsBalance.length - 1].amount);
-        setIsWithdrawalModalOpen(false);
-    }
-
-    /**
-     * when the user adds a new savings transaction:
-     * - add the amount to the dailySavingsBalance array
-     * - distribute to the savings goals that the user has set up
-     */
-    const addSavingsTransaction = async (savingsDate: Date, amount: string, priorityGoal: string, percentage: string) => {
-        const newSavingsBalance = [...dailySavingsBalanceMasterData];
-        const lastElement = newSavingsBalance[newSavingsBalance.length - 1];
-        const formattedDate = savingsDate.toLocaleDateString();
-        if (lastElement.date !== formattedDate) {
-            newSavingsBalance.push({date: formattedDate, amount: lastElement.amount});
-            if (newSavingsBalance.length > 365) {
-                newSavingsBalance.shift();
-            }
-        } else {
-            lastElement.amount += parseInt(amount);
-        }
-
-        const totalAmount = parseInt(amount);
-        const priorityPercentage = parseInt(percentage) / 100;
-        const priorityAmount = totalAmount * priorityPercentage;
-        const remainingAmount = totalAmount - priorityAmount;
-
-        const numNonPriorityGoals = savingsGoals.filter((goal: any) => goal.name !== priorityGoal).length;
-        const amountPerGoal = remainingAmount / numNonPriorityGoals;
-        const updatedSavingsGoals = savingsGoals.map((goal: any) => {
-            if (goal.name === priorityGoal) {
-                return {...goal, amountSaved: goal.amountSaved + priorityAmount};
-            } else {
-                return {...goal, amountSaved: goal.amountSaved + amountPerGoal};
-            }
-        });
-
-        const newSavingsData = {
-            dailySavingsBalance: newSavingsBalance,
-            savingsGoals: updatedSavingsGoals
-        };
-        updateSavingsDoc(newSavingsData)
-        setTotalSaved(newSavingsBalance[newSavingsBalance.length - 1].amount);
-        setIsDepositModalOpen(false);
-    };
 
     const changeChartView = (view: ViewKey) => {
         const newData = transformData(dailySavingsBalanceMasterData, view);
@@ -205,41 +112,22 @@ export default function Home() {
         }
     }
 
-    const openWithdrawalModal = () => {
-        setIsWithdrawalModalOpen(true);
-    }
-    const openDepositModal = () => {
-        setIsDepositModalOpen(true);
-    }
-
-    const openCreateGoalModal = (goalDisplayType: string) => {
-        setIsCreateGoalModalOpen(true);
-        setCreateGoalModalType(goalDisplayType)
-    }
-
     return (
         <main className="flex flex-col items-center relative disable-scroll">
-            <Header totalSaved={totalSaved}/>
+            <Header/>
             <SavingsChart dailySavingsBalance={dailySavingsBalanceChartData} selectedView={selectedView}
                           changeChartView={changeChartView}/>
 
             <div className={"flex w-11/12 my-4 space-x-4"}>
-                <WithdrawalButton openWithdrawalModal={openWithdrawalModal}/>
-                <DepositButton openDepositModal={openDepositModal}/>
+                <WithdrawalButton/>
+                <DepositButton/>
             </div>
 
-            <DisplayGoals openCreateGoalModal={openCreateGoalModal} savingsGoals={savingsGoals} setSavingsGoals={setSavingsGoals}/>
+            <DisplayGoals/>
 
-            <WithdrawalModal takeWithdrawal={takeWithdrawal}
-                             isWithdrawalModalOpen={isWithdrawalModalOpen}
-                             setIsWithdrawalModalOpen={setIsWithdrawalModalOpen}/>
-            <DepositModal addSavingsTransaction={addSavingsTransaction}
-                          isDepositModalOpen={isDepositModalOpen}
-                          setIsDepositModalOpen={setIsDepositModalOpen}
-                          savingsGoals={savingsGoals}/>
-            <CreateGoalModal createSavingsGoal={createSavingsGoal} createGoalModalType={createGoalModalType}
-                             isCreateGoalModalOpen={isCreateGoalModalOpen}
-                             setIsCreateGoalModalOpen={setIsCreateGoalModalOpen}/>
+            <WithdrawalModal/>
+            <DepositModal/>
+            <CreateGoalModal/>
         </main>
     );
 }

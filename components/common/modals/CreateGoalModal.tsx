@@ -1,11 +1,39 @@
-import React, {useState, useEffect} from "react"
+import React, {useState, useContext} from "react"
 import Modal from "@/components/common/modals/Modal";
+import {updateSavingsDoc} from "@/lib/firebase";
+import {generateId} from "@/lib/utils";
+import {ModalOpenContext} from "@/lib/context/ModalOpenContext";
+import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
 
-export default function CreateGoalModal({createGoalModalType, isCreateGoalModalOpen, setIsCreateGoalModalOpen, createSavingsGoal}: any){
+export default function CreateGoalModal() {
+    const {isCreateGoalModalOpen, setIsCreateGoalModalOpen, createGoalModalType} = useContext(ModalOpenContext);
+    const {savingsGoals, setSavingsGoals} = useContext(SavingsDataContext);
     const [name, setName] = useState("");
     const [amount, setAmount] = useState(0);
     const [imageUrl, setImageUrl] = useState("");
+
     const goalModalTypeText = createGoalModalType === "necessities" ? "Necessity" : "Want";
+
+    const createSavingsGoal = (name: string, amount: number, imageUrl: string) => {
+        const newGoal = {
+            id: generateId(),
+            type: createGoalModalType,
+            imageUrl,
+            name,
+            amountTarget: amount,
+            amountSaved: 0,
+        };
+        const newGoals = [...savingsGoals, newGoal];
+
+        const newSavingsData = {
+            savingsGoals: newGoals
+        };
+        updateSavingsDoc(newSavingsData)
+
+        // @ts-ignore
+        setSavingsGoals(newGoals);
+        setIsCreateGoalModalOpen(false);
+    }
 
     return (
         <Modal isModalOpen={isCreateGoalModalOpen} setIsModalOpen={setIsCreateGoalModalOpen}>

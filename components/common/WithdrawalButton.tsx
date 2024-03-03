@@ -1,10 +1,13 @@
-import React from "react"
+import React, {useContext} from "react"
+import {ModalOpenContext} from "@/lib/context/ModalOpenContext";
 
-interface WithdrawalButtonProps {
-    openWithdrawalModal: () => void;
-}
+export default function WithdrawalButton() {
+    const {setIsWithdrawalModalOpen} = useContext(ModalOpenContext);
 
-export default function WithdrawalButton({openWithdrawalModal}: WithdrawalButtonProps) {
+    const openWithdrawalModal = () => {
+        setIsWithdrawalModalOpen(true);
+    }
+
     return (
         <button onClick={openWithdrawalModal}
                 className="bg-red-300 w-full rounded-lg p-4 whitespace-no-wrap text-lg cursor-pointer hover:bg-red-500 text-white">

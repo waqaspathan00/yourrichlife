@@ -1,8 +1,5 @@
-import React from "react"
-
-interface DepositButtonProps {
-    openDepositModal: () => void;
-}
+import React, {useContext} from "react"
+import {ModalOpenContext} from "@/lib/context/ModalOpenContext";
 
 /**
  * This component is a button that allows the user to deposit money into their account
@@ -12,7 +9,13 @@ interface DepositButtonProps {
  *
  * @constructor
  */
-export default function DepositButton({openDepositModal}: DepositButtonProps) {
+export default function DepositButton() {
+    const {setIsDepositModalOpen} = useContext(ModalOpenContext);
+
+    const openDepositModal = () => {
+        setIsDepositModalOpen(true);
+    }
+
     return (
         <button onClick={openDepositModal}
                 className="bg-green-400 w-full rounded-lg p-4 text-lg cursor-pointer hover:bg-green-600 text-white">

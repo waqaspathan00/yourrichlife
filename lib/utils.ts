@@ -1474,6 +1474,10 @@ export const getNumberOfDaysPassedInYear = () => {
     return day + 1;
 }
 
+export const generateId = () => {
+    return Math.floor(Math.random() * 1000000);
+}
+
 export type ViewKey = '1M' | '3M' | '6M' | '1Y' | 'YTD';
 export const viewToDaysMap = {
     "1M": 30,
