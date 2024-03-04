@@ -3,7 +3,13 @@ import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
 import Modal from "@/components/common/modals/Modal";
 import {ModalOpenContext} from "@/lib/context/ModalOpenContext";
 import {updateSavingsDoc} from "@/lib/firebase";
+import {Goal} from "@/lib/types";
 
+/**
+ * in this modal the user will be able to distribute funds to their savings goals
+ * these funds are currently undistributed based on the total amount saved and the amount saved to each goal
+ * the user will be able to select a priority goal and a percentage of the total amount to distribute to that goal
+ */
 export default function DistributeFundsModal() {
     const {savingsGoals, setSavingsGoals, undistributedFunds, setUndistributedFunds} = useContext(SavingsDataContext);
     const {isDistributeFundsModalOpen, setIsDistributeFundsModalOpen} = useContext(ModalOpenContext);
@@ -11,25 +17,29 @@ export default function DistributeFundsModal() {
     const [priorityGoal, setPriorityGoal] = useState("");
     const [percentage, setPercentage] = useState("");
 
+    /**
+     * totalAmountToDistribute will be the amount the user enters and will be decremented as we distribute to each goal
+     */
     const handleDistributeFunds = () => {
         let totalAmountToDistribute = parseInt(amount);
         const priorityPercentage = parseInt(percentage) / 100;
         const priorityDistributionAmount = totalAmountToDistribute * priorityPercentage;
         const postPriorityDistributionAmount = totalAmountToDistribute - priorityDistributionAmount;
 
-        const numNonPriorityGoals = savingsGoals.filter((goal: any) => goal.name !== priorityGoal).length;
+        const numNonPriorityGoals = savingsGoals
+            .filter((goal: Goal) => goal.name !== priorityGoal)
+            .filter((goal: Goal) => goal.amountSaved < goal.amountTarget)
+            .length;
         const amountPerGoal = postPriorityDistributionAmount / numNonPriorityGoals;
-        const updatedSavingsGoals = savingsGoals.map((goal: any) => {
+        const updatedSavingsGoals = savingsGoals.map((goal: Goal) => {
             if (goal.name === priorityGoal) {
                 if (goal.amountSaved + priorityDistributionAmount > goal.amountTarget) {
                     totalAmountToDistribute -= (goal.amountTarget - goal.amountSaved);
-                    console.log("totalAmountToDistribute", totalAmountToDistribute)
                     return {...goal, amountSaved: goal.amountTarget};
                 }
                 totalAmountToDistribute -= priorityDistributionAmount;
                 return {...goal, amountSaved: goal.amountSaved + priorityDistributionAmount};
             } else {
-                // ensure that the addition of the non-priority distribution amount does not exceed the target amount of the goal
                 if (goal.amountSaved + amountPerGoal > goal.amountTarget) {
                     totalAmountToDistribute -= (goal.amountTarget - goal.amountSaved);
                     return {...goal, amountSaved: goal.amountTarget};
@@ -72,7 +82,7 @@ export default function DistributeFundsModal() {
                         <select className={"border-2 p-2 h-full rounded-md"} name="goal" id="goal" value={priorityGoal}
                                 onChange={(e) => setPriorityGoal(e.target.value)}>
                             <option value={"none"}>None</option>
-                            {savingsGoals.map((goal: any) => (
+                            {savingsGoals.map((goal: Goal) => (
                                 <option value={goal.name}>{goal.name}</option>
                             ))}
                         </select>

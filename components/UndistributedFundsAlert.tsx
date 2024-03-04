@@ -12,7 +12,7 @@ export default function UndistributedFundsAlert() {
     }
 
     return (
-        <div className={"w-11/12 rounded-lg p-4 bg-white flex items-center justify-between mb-4"}>
+        <div className={"w-11/12 rounded-lg p-4 bg-white flex items-center justify-between "}>
             <div className={"flex items-center"}>
                 <IoWarning className={"text-2xl mr-2 text-yellow-500"}/>
                 <p>Undistributed funds: ${undistributedFunds}</p>

@@ -2,9 +2,10 @@ export type Goal = {
     id: number,
     type: string,
     name: string,
-    imageUrl: string,
+    emoji: string,
     amountSaved: number,
-    amountTarget: number
+    amountTarget: number,
+    completed: boolean
 }
 
 export type DailySavingsBalance = {

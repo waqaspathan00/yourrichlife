@@ -4,6 +4,7 @@ import DatePickerTailwind from "@/components/common/DatePicker";
 import {updateSavingsDoc} from "@/lib/firebase";
 import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
 import {ModalOpenContext} from "@/lib/context/ModalOpenContext";
+import {Goal} from "@/lib/types";
 
 export default function DepositModal() {
     const {isDepositModalOpen, setIsDepositModalOpen} = useContext(ModalOpenContext)
@@ -15,7 +16,12 @@ export default function DepositModal() {
 
     /**
      * when the user adds a new savings transaction:
-     * - add the amount to the dailySavingsBalance array
+     * - add the amount to the dailySavingsBalance array, first check the date entered by the user
+     *   - if the date of the last element in the array is not today, add a new element to the array
+     *   - if the date of the last element in the array is today AND the user entered todays date, add the amount to the last element
+     *   - if the user entered a date that is not today, update the correct element in the array with the new amount
+     *   - if the array has more than 365 elements, remove the first element
+     * - update the totalSaved state with the new total amount saved
      * - distribute to the savings goals that the user has set up
      */
     const addSavingsTransaction = async (savingsDate: Date, amount: string, priorityGoal: string, percentage: string) => {
@@ -36,9 +42,9 @@ export default function DepositModal() {
         const priorityAmount = totalAmount * priorityPercentage;
         const remainingAmount = totalAmount - priorityAmount;
 
-        const numNonPriorityGoals = savingsGoals.filter((goal: any) => goal.name !== priorityGoal).length;
+        const numNonPriorityGoals = savingsGoals.filter((goal: Goal) => goal.name !== priorityGoal).length;
         const amountPerGoal = remainingAmount / numNonPriorityGoals;
-        const updatedSavingsGoals = savingsGoals.map((goal: any) => {
+        const updatedSavingsGoals = savingsGoals.map((goal: Goal) => {
             if (goal.name === priorityGoal) {
                 return {...goal, amountSaved: goal.amountSaved + priorityAmount};
             } else {

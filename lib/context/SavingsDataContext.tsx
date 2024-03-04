@@ -12,6 +12,8 @@ interface SavingsDataContextProps {
     setUndistributedFunds: (funds: number) => void;
     savingsGoals: Goal[];
     setSavingsGoals: (goals: Goal[]) => void;
+    completedGoals: Goal[];
+    setCompletedGoals: (goals: Goal[]) => void;
 }
 
 export const SavingsDataContext = createContext<SavingsDataContextProps>({
@@ -26,11 +28,13 @@ export const SavingsDataContext = createContext<SavingsDataContextProps>({
     },
     undistributedFunds: 0,
     setUndistributedFunds: () => {
-
     },
     savingsGoals: [],
     setSavingsGoals: () => {
     },
+    completedGoals: [],
+    setCompletedGoals: () => {
+    }
 })
 
 interface SavingsDataProviderProps {
@@ -43,6 +47,7 @@ export const SavingsDataProvider = ({children}: SavingsDataProviderProps) => {
     const [totalSaved, setTotalSaved] = useState(0);
     const [undistributedFunds, setUndistributedFunds] = useState(0);
     const [savingsGoals, setSavingsGoals] = useState<Goal[]>([]);
+    const [completedGoals, setCompletedGoals] = useState<Goal[]>([]);
 
     return (
         <SavingsDataContext.Provider value={{
@@ -55,7 +60,9 @@ export const SavingsDataProvider = ({children}: SavingsDataProviderProps) => {
             undistributedFunds,
             setUndistributedFunds,
             savingsGoals,
-            setSavingsGoals
+            setSavingsGoals,
+            completedGoals,
+            setCompletedGoals
         }}>
             {children}
         </SavingsDataContext.Provider>

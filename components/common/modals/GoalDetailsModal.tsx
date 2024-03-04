@@ -1,21 +1,40 @@
 import {Goal} from "@/lib/types";
 import Modal from "@/components/common/modals/Modal";
 import ProgressBar from "@/components/ProgressBar";
-import React from "react";
+import React, {useContext} from "react";
+import {deleteGoal} from "@/lib/firebase";
+import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
 
 interface GoalDetailsModalProps {
     goal: Goal;
-    handleDeleteGoal: (id: number) => void;
     isGoalDetailsModalOpen: boolean;
     setIsGoalDetailsModalOpen: (isGoalDetailsModalOpen: boolean) => void;
 }
 
-export default function GoalDetailsModal({goal, handleDeleteGoal, isGoalDetailsModalOpen, setIsGoalDetailsModalOpen}: GoalDetailsModalProps) {
+export default function GoalDetailsModal({
+                                             goal,
+                                             isGoalDetailsModalOpen,
+                                             setIsGoalDetailsModalOpen
+                                         }: GoalDetailsModalProps) {
+    const {savingsGoals, setSavingsGoals, completedGoals, setCompletedGoals} = useContext(SavingsDataContext);
+
+    const handleDeleteGoal = async (id: number) => {
+        if (goal.completed) {
+            const updatedCompletedGoals = await deleteGoal(completedGoals, id)
+            setCompletedGoals(updatedCompletedGoals);
+        } else {
+            const updatedSavingsGoals = await deleteGoal(savingsGoals, id)
+            setSavingsGoals(updatedSavingsGoals);
+        }
+    }
+
     return (
         <Modal isModalOpen={isGoalDetailsModalOpen} setIsModalOpen={setIsGoalDetailsModalOpen}>
             <div className={"flex flex-col items-center"}>
-                <img className={"rounded-lg w-full"} src={goal.imageUrl} alt={goal.name} width={100} height={100}/>
-                <p>{goal.name}</p>
+                <div className={"flex items-center"}>
+                    <div className={"text-2xl"}>{goal.emoji}</div>
+                    <p className={"capitalize text-xl ml-4"}>{goal.name}</p>
+                </div>
                 <div className={"flex flex-col w-full"}>
                     <div className={"my-2 overflow-hidden"}>
                         <ProgressBar currentSaved={goal.amountSaved} totalRequired={goal.amountTarget}/>

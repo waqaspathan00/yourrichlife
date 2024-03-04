@@ -38,9 +38,20 @@ export const getSavingsData = async () => {
     return savingsDoc.data();
 }
 
-export const deleteGoal = async (id: number) => {
-    const savingsData = await getSavingsData();
-    const newGoals = savingsData?.savingsGoals.filter((goal: Goal) => goal.id !== id);
+export const completeGoal = async (savingsGoals: Goal[], completedGoals: Goal[], id: number) => {
+    const completedGoal = savingsGoals.find((goal: Goal) => goal.id === id)
+    if (!completedGoal) {
+        throw new Error("Goal not found");
+    }
+    completedGoal.completed = true;
+    const newSavingsGoals = savingsGoals.filter((goal: Goal) => goal.id !== id);
+    const newCompletedGoals = [...completedGoals, completedGoal];
+    await updateSavingsDoc({savingsGoals: newSavingsGoals, completedGoals: newCompletedGoals});
+    return {savingsGoals: newSavingsGoals, completedGoals: newCompletedGoals};
+}
+
+export const deleteGoal = async (savingsGoals: Goal[], id: number) => {
+    const newGoals = savingsGoals.filter((goal: Goal) => goal.id !== id);
     await updateSavingsDoc({savingsGoals: newGoals});
     return newGoals;
 }

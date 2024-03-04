@@ -34,7 +34,7 @@ export default function WithdrawalModal() {
                            placeholder={"Amount"}
                            value={amount} onChange={(e) => setAmount(parseInt(e.target.value))}/>
                 </div>
-                <button className={"bg-blue-600 w-full rounded-full p-4 text-lg text-white"}
+                <button className={"bg-blue-600 w-full rounded-full p-2 text-lg text-white"}
                     onClick={() => takeWithdrawal(amount)}
                         type="submit">
                     Withdraw

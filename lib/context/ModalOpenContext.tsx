@@ -13,6 +13,8 @@ interface ModalOpenContextProps {
     setIsDistributeFundsModalOpen: (isDistributeFundsModalOpen: boolean) => void;
     isEmojiPickerModalOpen: boolean;
     setIsEmojiPickerModalOpen: (isEmojiPickerModalOpen: boolean) => void;
+    // isCompleteGoalModalOpen: boolean;
+    // setIsCompleteGoalModalOpen: (isCompleteGoalModalOpen: boolean) => void;
 }
 
 export const ModalOpenContext = createContext<ModalOpenContextProps>({
@@ -33,7 +35,10 @@ export const ModalOpenContext = createContext<ModalOpenContextProps>({
     },
     isEmojiPickerModalOpen: false,
     setIsEmojiPickerModalOpen: () => {
-    }
+    },
+    // isCompleteGoalModalOpen: false,
+    // setIsCompleteGoalModalOpen: () => {
+    // }
 })
 
 interface ModalOpenProviderProps {
@@ -47,6 +52,7 @@ export const ModalOpenProvider = ({children}: ModalOpenProviderProps) => {
     const [isWithdrawalModalOpen, setIsWithdrawalModalOpen] = useState(false);
     const [isDistributeFundsModalOpen, setIsDistributeFundsModalOpen] = useState(false);
     const [isEmojiPickerModalOpen, setIsEmojiPickerModalOpen] = useState(false);
+    // const [isCompleteGoalModalOpen, setIsCompleteGoalModalOpen] = useState(false);
 
     return (
         <ModalOpenContext.Provider value={{
@@ -61,7 +67,9 @@ export const ModalOpenProvider = ({children}: ModalOpenProviderProps) => {
             isDistributeFundsModalOpen,
             setIsDistributeFundsModalOpen,
             isEmojiPickerModalOpen,
-            setIsEmojiPickerModalOpen
+            setIsEmojiPickerModalOpen,
+            // isCompleteGoalModalOpen,
+            // setIsCompleteGoalModalOpen
         }}>
             {children}
         </ModalOpenContext.Provider>

@@ -3,17 +3,15 @@ import CreateGoalModal from "@/components/common/modals/CreateGoalModal";
 import DepositModal from "@/components/common/modals/DepositModal";
 import Header from "@/components/Header";
 import SavingsChart from "@/components/common/SavingsChart";
-import DisplayGoals from "@/components/DisplayGoals";
-import {getSavingsData, updateSavingsDoc} from "@/lib/firebase";
+import {getSavingsData} from "@/lib/firebase";
 import DepositButton from "@/components/DepositButton";
 import WithdrawalButton from "@/components/common/WithdrawalButton";
 import WithdrawalModal from "@/components/common/modals/WithdrawalModal";
-import {DailySavingsBalance, Goal} from "@/lib/types";
+import {Goal} from "@/lib/types";
 import {getNumberOfDaysPassedInYear, ViewKey, viewToDaysMap} from "@/lib/utils";
 import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
-import UndistributedFundsAlert from "@/components/UndistributedFundsAlert";
 import DistributeFundsModal from "@/components/common/modals/DistributeFundsModal";
-import EmojiPickerModal from "@/components/common/modals/EmojiPickerModal";
+import DisplayGoals from "@/components/DisplayGoals";
 
 
 /**
@@ -25,13 +23,10 @@ import EmojiPickerModal from "@/components/common/modals/EmojiPickerModal";
  *  During this process, the user can identify a goal to prioritize and what percentage of the transaction should go to that goal
  *
  * for next time:
- * - add file image upload for savings goals
- *      - save the image to firebase storage
  * - add ability to read a csv file of savings data and transform it into the data array
  * - add a sign in screen
  * - make savings goals editable
- * - round out goal disbursement logic, and to the nearest dollar
-
+ *
  * - add a circular progress bar to the savings goals
  * - plaid integration
  * - user should be able to deposit savings into different accounts
@@ -55,7 +50,8 @@ export default function Home() {
         setDailySavingsBalanceChartData,
         setTotalSaved,
         setUndistributedFunds,
-        setSavingsGoals
+        setSavingsGoals,
+        setCompletedGoals
     } = useContext(SavingsDataContext);
     const [selectedView, setSelectedView] = useState<ViewKey>('3M'); // Default view
 
@@ -64,7 +60,6 @@ export default function Home() {
         const fetchData = async () => {
             const savingsData = await getSavingsData();
             if (savingsData) {
-                // extract dailySavingsBalance, savingsGoals from savingsData and rename them as fetchedDailySavingsBalance, fetchedSavingsGoals
                 const {dailySavingsBalance: fetchedDailySavingsBalance, savingsGoals: fetchedSavingsGoals} = savingsData;
                 const lastElement = fetchedDailySavingsBalance[fetchedDailySavingsBalance.length - 1];
                 const currentSavingsAmount = lastElement.amount;
@@ -74,6 +69,7 @@ export default function Home() {
                 setTotalSaved(currentSavingsAmount)
                 setUndistributedFunds(undistributedFunds);
                 setSavingsGoals(fetchedSavingsGoals);
+                setCompletedGoals(savingsData.completedGoals);
                 changeChartView(selectedView);
 
                 const newData = transformData(savingsData.dailySavingsBalance, selectedView);
@@ -111,8 +107,6 @@ export default function Home() {
                 <WithdrawalButton/>
                 <DepositButton/>
             </div>
-
-            <UndistributedFundsAlert />
 
             <DisplayGoals/>
             <DisplayModals/>
