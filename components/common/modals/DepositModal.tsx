@@ -5,11 +5,19 @@ import {updateSavingsDoc} from "@/lib/firebase";
 import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
 import {ModalOpenContext} from "@/lib/context/ModalOpenContext";
 import {Goal} from "@/lib/types";
+import {distributeFundsToGoals, updateDataInLocalStorage} from "@/lib/utils";
 
 export default function DepositModal() {
     const {isDepositModalOpen, setIsDepositModalOpen} = useContext(ModalOpenContext)
-    const {dailySavingsBalanceMasterData, setTotalSaved, savingsGoals, setSavingsGoals} = useContext(SavingsDataContext);
-    const [savingsDate, setSavingsDate] = useState(new Date());
+    const {
+        dailySavingsBalanceMasterData,
+        setTotalSaved,
+        savingsGoals,
+        setSavingsGoals,
+        undistributedFunds,
+        setUndistributedFunds
+    } = useContext(SavingsDataContext);
+    const [savingsDate, setSavingsDate] = useState(new Date());  // remove this field, no longer asking for it
     const [amount, setAmount] = useState("");
     const [priorityGoal, setPriorityGoal] = useState("");
     const [percentage, setPercentage] = useState("");
@@ -17,40 +25,34 @@ export default function DepositModal() {
     /**
      * when the user adds a new savings transaction:
      * - add the amount to the dailySavingsBalance array, first check the date entered by the user
-     *   - if the date of the last element in the array is not today, add a new element to the array
      *   - if the date of the last element in the array is today AND the user entered todays date, add the amount to the last element
      *   - if the user entered a date that is not today, update the correct element in the array with the new amount
      *   - if the array has more than 365 elements, remove the first element
      * - update the totalSaved state with the new total amount saved
      * - distribute to the savings goals that the user has set up
+     *
+     * - this logic is still flawed:
+     *   - we should be adding a new row when the user signs in for the day
+     *   - if we update a savings value from the past that means we are changing history and have to update all future values
      */
     const addSavingsTransaction = async (savingsDate: Date, amount: string, priorityGoal: string, percentage: string) => {
         const newSavingsBalance = [...dailySavingsBalanceMasterData];
         const lastElement = newSavingsBalance[newSavingsBalance.length - 1];
-        const formattedDate = savingsDate.toLocaleDateString();
-        if (lastElement.date !== formattedDate) {  // this logic is flawed right now
-            newSavingsBalance.push({date: formattedDate, amount: lastElement.amount});
-            if (newSavingsBalance.length > 365) {
-                newSavingsBalance.shift();
-            }
+        const lastElementDate = new Date(lastElement.date).toLocaleDateString()
+        const enteredDate = savingsDate.toLocaleDateString();
+        const TODAY = new Date().toLocaleDateString();
+        if (lastElementDate === TODAY && enteredDate === TODAY) {
+            newSavingsBalance[newSavingsBalance.length - 1].amount += parseInt(amount);
         } else {
-            lastElement.amount += parseInt(amount);
+            const index = newSavingsBalance.findIndex((element) => element.date === enteredDate);
+            newSavingsBalance[index].amount += parseInt(amount);
+        }
+        if (newSavingsBalance.length > 365) {
+            newSavingsBalance.shift();
         }
 
-        const totalAmount = parseInt(amount);
-        const priorityPercentage = parseInt(percentage) / 100;
-        const priorityAmount = totalAmount * priorityPercentage;
-        const remainingAmount = totalAmount - priorityAmount;
-
-        const numNonPriorityGoals = savingsGoals.filter((goal: Goal) => goal.name !== priorityGoal).length;
-        const amountPerGoal = remainingAmount / numNonPriorityGoals;
-        const updatedSavingsGoals = savingsGoals.map((goal: Goal) => {
-            if (goal.name === priorityGoal) {
-                return {...goal, amountSaved: goal.amountSaved + priorityAmount};
-            } else {
-                return {...goal, amountSaved: goal.amountSaved + amountPerGoal};
-            }
-        });
+        const {remainingFundsToDistribute, updatedSavingsGoals} = distributeFundsToGoals(amount, percentage, priorityGoal, savingsGoals);
+        const updatedUndistributedFunds = undistributedFunds - parseInt(amount) + remainingFundsToDistribute
 
         const newSavingsData = {
             dailySavingsBalance: newSavingsBalance,
@@ -58,16 +60,21 @@ export default function DepositModal() {
         };
 
         updateSavingsDoc(newSavingsData)
+
         setTotalSaved(newSavingsBalance[newSavingsBalance.length - 1].amount);
         setSavingsGoals(updatedSavingsGoals);
+        setUndistributedFunds(updatedUndistributedFunds);
         setIsDepositModalOpen(false);
+
+        updateDataInLocalStorage("savingsGoals", updatedSavingsGoals)
+        updateDataInLocalStorage("dailySavingsBalance", newSavingsBalance)
     };
 
     return (
         <Modal isModalOpen={isDepositModalOpen} setIsModalOpen={setIsDepositModalOpen}>
             <h2 className={"text-center text-xl font-bold"}>Add Savings</h2>
             <div className={"space-y-4"}>
-                <DatePickerTailwind savingsDate={savingsDate} setSavingsDate={setSavingsDate}/>
+                {/*<DatePickerTailwind savingsDate={savingsDate} setSavingsDate={setSavingsDate}/>*/}
 
                 <div className={"flex flex-col"}>
                     <label htmlFor="amount">

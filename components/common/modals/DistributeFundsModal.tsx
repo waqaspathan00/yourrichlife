@@ -4,6 +4,7 @@ import Modal from "@/components/common/modals/Modal";
 import {ModalOpenContext} from "@/lib/context/ModalOpenContext";
 import {updateSavingsDoc} from "@/lib/firebase";
 import {Goal} from "@/lib/types";
+import {distributeFundsToGoals} from "@/lib/utils";
 
 /**
  * in this modal the user will be able to distribute funds to their savings goals
@@ -21,39 +22,13 @@ export default function DistributeFundsModal() {
      * totalAmountToDistribute will be the amount the user enters and will be decremented as we distribute to each goal
      */
     const handleDistributeFunds = () => {
-        let totalAmountToDistribute = parseInt(amount);
-        const priorityPercentage = parseInt(percentage) / 100;
-        const priorityDistributionAmount = totalAmountToDistribute * priorityPercentage;
-        const postPriorityDistributionAmount = totalAmountToDistribute - priorityDistributionAmount;
-
-        const numNonPriorityGoals = savingsGoals
-            .filter((goal: Goal) => goal.name !== priorityGoal)
-            .filter((goal: Goal) => goal.amountSaved < goal.amountTarget)
-            .length;
-        const amountPerGoal = postPriorityDistributionAmount / numNonPriorityGoals;
-        const updatedSavingsGoals = savingsGoals.map((goal: Goal) => {
-            if (goal.name === priorityGoal) {
-                if (goal.amountSaved + priorityDistributionAmount > goal.amountTarget) {
-                    totalAmountToDistribute -= (goal.amountTarget - goal.amountSaved);
-                    return {...goal, amountSaved: goal.amountTarget};
-                }
-                totalAmountToDistribute -= priorityDistributionAmount;
-                return {...goal, amountSaved: goal.amountSaved + priorityDistributionAmount};
-            } else {
-                if (goal.amountSaved + amountPerGoal > goal.amountTarget) {
-                    totalAmountToDistribute -= (goal.amountTarget - goal.amountSaved);
-                    return {...goal, amountSaved: goal.amountTarget};
-                }
-                totalAmountToDistribute -= amountPerGoal;
-                return {...goal, amountSaved: goal.amountSaved + amountPerGoal};
-            }
-        });
+        const {remainingFundsToDistribute, updatedSavingsGoals} = distributeFundsToGoals(amount, percentage, priorityGoal, savingsGoals);
 
         const newSavingsData = {
             savingsGoals: updatedSavingsGoals
         };
 
-        const updatedUndistributedFunds = undistributedFunds - (parseInt(amount) - totalAmountToDistribute)
+        const updatedUndistributedFunds = undistributedFunds - (parseInt(amount) - remainingFundsToDistribute)
 
         updateSavingsDoc(newSavingsData)
         setSavingsGoals(updatedSavingsGoals);

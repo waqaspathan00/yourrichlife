@@ -1,3 +1,5 @@
+import {Goal} from "@/lib/types";
+
 export const mockDailySavingsBalance = [
     {
         "date": "3/2/2023",
@@ -1474,11 +1476,56 @@ export const getNumberOfDaysPassedInYear = () => {
     return day + 1;
 }
 
+export const calculateUndistributedFunds = (currentSavingsAmount: number, fetchedSavingsGoals: Goal[]) => {
+    return currentSavingsAmount - fetchedSavingsGoals.reduce((acc: number, goal: Goal) => acc + goal.amountSaved, 0);
+}
+
+export const distributeFundsToGoals = (amountToDistribute: string, percentage: string, priorityGoal: string, fetchedSavingsGoals: Goal[]) => {
+    let totalAmountToDistribute = parseInt(amountToDistribute);
+    const priorityPercentage = parseInt(percentage) / 100;
+    const priorityDistributionAmount = totalAmountToDistribute * priorityPercentage;
+    const postPriorityDistributionAmount = totalAmountToDistribute - priorityDistributionAmount;
+
+    const numNonPriorityGoals = fetchedSavingsGoals
+        .filter((goal: Goal) => goal.name !== priorityGoal)
+        .filter((goal: Goal) => goal.amountSaved < goal.amountTarget)
+        .length;
+    const amountPerGoal = postPriorityDistributionAmount / numNonPriorityGoals;
+    const updatedSavingsGoals = fetchedSavingsGoals.map((goal: Goal) => {
+        if (goal.name === priorityGoal) {
+            if (goal.amountSaved + priorityDistributionAmount > goal.amountTarget) {
+                totalAmountToDistribute -= (goal.amountTarget - goal.amountSaved);
+                return {...goal, amountSaved: goal.amountTarget};
+            }
+            totalAmountToDistribute -= priorityDistributionAmount;
+            return {...goal, amountSaved: goal.amountSaved + priorityDistributionAmount};
+        } else {
+            if (goal.amountSaved + amountPerGoal > goal.amountTarget) {
+                totalAmountToDistribute -= (goal.amountTarget - goal.amountSaved);
+                return {...goal, amountSaved: goal.amountTarget};
+            }
+            totalAmountToDistribute -= amountPerGoal;
+            return {...goal, amountSaved: goal.amountSaved + amountPerGoal};
+        }
+    });
+
+    return {remainingFundsToDistribute: totalAmountToDistribute, updatedSavingsGoals};
+}
+
+export const setDataToLocalStorage = (savingsDataObj: any) => {
+    localStorage.setItem("savingsData", JSON.stringify(savingsDataObj));
+}
+
+export const updateDataInLocalStorage = (key: string, value: any) => {
+    const savingsData = JSON.parse(localStorage.getItem("savingsData")!);
+    savingsData[key] = value;
+    localStorage.setItem("savingsData", JSON.stringify(savingsData));
+}
+
 export const generateId = () => {
     return Math.floor(Math.random() * 1000000);
 }
 
-export type ViewKey = '1M' | '3M' | '6M' | '1Y' | 'YTD';
 export const viewToDaysMap = {
     "1M": 30,
     "3M": 90,

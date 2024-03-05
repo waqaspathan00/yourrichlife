@@ -13,4 +13,10 @@ export type DailySavingsBalance = {
     amount: number
 }
 
-export type ChartView = "1M" | "3M" | "YTD" | "1Y" | "ALL"
+export type SavingsData = {
+    dailySavingsBalance: DailySavingsBalance[],
+    savingsGoals: Goal[],
+    completedGoals: Goal[]
+}
+
+export type ViewKey = '1M' | '3M' | '6M' | '1Y' | 'YTD';

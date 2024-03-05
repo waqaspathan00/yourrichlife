@@ -1,7 +1,7 @@
 import React, {useState, useContext} from "react"
 import Modal from "@/components/common/modals/Modal";
 import {updateSavingsDoc} from "@/lib/firebase";
-import {generateId} from "@/lib/utils";
+import {generateId, updateDataInLocalStorage} from "@/lib/utils";
 import {ModalOpenContext} from "@/lib/context/ModalOpenContext";
 import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
 import EmojiPickerModal from "@/components/common/modals/EmojiPickerModal";
@@ -36,6 +36,7 @@ export default function CreateGoalModal() {
             savingsGoals: newGoals
         };
         updateSavingsDoc(newSavingsData)
+        updateDataInLocalStorage()
 
         // @ts-ignore
         setSavingsGoals(newGoals);
@@ -43,6 +44,8 @@ export default function CreateGoalModal() {
 
         setName("");
         setAmount(0);
+
+        updateDataInLocalStorage("savingsGoals", newGoals)
     }
 
     const openModal = () => {

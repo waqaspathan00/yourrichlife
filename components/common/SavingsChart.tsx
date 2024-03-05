@@ -1,12 +1,11 @@
 import React, {useContext} from "react"
 import StepLineChart from "@/components/StepLineChart";
-import {DailySavingsBalance} from "@/lib/types";
-import {ViewKey} from "@/lib/utils";
+import {DailySavingsBalance, ViewKey} from "@/lib/types";
 import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
 
 interface SavingsChartProps {
     selectedView: ViewKey;
-    changeChartView: (view: ViewKey) => void;
+    changeChartView: (dailySavingsBalance: DailySavingsBalance[], view: ViewKey) => void;
 }
 
 export default function SavingsChart({selectedView, changeChartView}: SavingsChartProps) {
@@ -27,13 +26,15 @@ export default function SavingsChart({selectedView, changeChartView}: SavingsCha
 
 const ChangeChartViewButton = ({selectedView, changeChartView, view}: {
     selectedView: ViewKey,
-    changeChartView: (view: ViewKey) => void,
+    changeChartView: (dailySavingsBalance: DailySavingsBalance[], view: ViewKey) => void;
     view: ViewKey
 }) => {
+    const {dailySavingsBalanceMasterData} = useContext(SavingsDataContext);
+
     return (
         <button
             className={`${selectedView === view ? "text-white bg-gray-400" : "text-gray-400 "} font-bold transition-all w-full p-2 mx-1 rounded-full`}
-            onClick={() => changeChartView(view)}>{view}
+            onClick={() => changeChartView(dailySavingsBalanceMasterData, view)}>{view}
         </button>
     )
 }

@@ -7,11 +7,17 @@ import {getSavingsData} from "@/lib/firebase";
 import DepositButton from "@/components/DepositButton";
 import WithdrawalButton from "@/components/common/WithdrawalButton";
 import WithdrawalModal from "@/components/common/modals/WithdrawalModal";
-import {Goal} from "@/lib/types";
-import {getNumberOfDaysPassedInYear, ViewKey, viewToDaysMap} from "@/lib/utils";
+import {DailySavingsBalance, ViewKey} from "@/lib/types";
+import {
+    calculateUndistributedFunds,
+    getNumberOfDaysPassedInYear,
+    setDataToLocalStorage,
+    viewToDaysMap
+} from "@/lib/utils";
 import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
 import DistributeFundsModal from "@/components/common/modals/DistributeFundsModal";
 import DisplayGoals from "@/components/DisplayGoals";
+import toast from "react-hot-toast";
 
 
 /**
@@ -23,13 +29,29 @@ import DisplayGoals from "@/components/DisplayGoals";
  *  During this process, the user can identify a goal to prioritize and what percentage of the transaction should go to that goal
  *
  * for next time:
+ * - add form validation logic to all modals
  * - add ability to read a csv file of savings data and transform it into the data array
  * - add a sign in screen
  * - make savings goals editable
+ * - more toast notifications
+ * - deploy to vercel
+ * - make into PWA
+ * - fix all build issues
  *
  * - add a circular progress bar to the savings goals
  * - plaid integration
  * - user should be able to deposit savings into different accounts
+ *
+ * daily fetch logic:
+ * - start by fetching a property in local storage that contains the last day the user signed in
+ * - if the last day the user signed in is not today:
+ *   - fetch the data array from firebase
+ *   - add a new element to the data array with the same value as the last element
+ *   - save the data array to firebase
+ *   - update the last day the user signed in in local storage
+ * - if the last day the user signed in is today, do nothing
+ *
+ * - when the user signs in for the day, check if the last element in the array is the current day
  *
  * PRIORITIES:
  * - savings tracking logic: (in progress)
@@ -57,33 +79,91 @@ export default function Home() {
 
 
     useEffect(() => {
-        const fetchData = async () => {
-            const savingsData = await getSavingsData();
-            if (savingsData) {
-                const {dailySavingsBalance: fetchedDailySavingsBalance, savingsGoals: fetchedSavingsGoals} = savingsData;
-                const lastElement = fetchedDailySavingsBalance[fetchedDailySavingsBalance.length - 1];
-                const currentSavingsAmount = lastElement.amount;
-                const undistributedFunds = currentSavingsAmount - fetchedSavingsGoals.reduce((acc: number, goal: Goal) => acc + goal.amountSaved, 0);
+        const dateLastSignedIn = localStorage.getItem("dateLastSignedIn");
+        const TODAY = new Date().toLocaleDateString();
 
-                setDailySavingsBalanceMasterData(fetchedDailySavingsBalance);
-                setTotalSaved(currentSavingsAmount)
-                setUndistributedFunds(undistributedFunds);
-                setSavingsGoals(fetchedSavingsGoals);
-                setCompletedGoals(savingsData.completedGoals);
-                changeChartView(selectedView);
-
-                const newData = transformData(savingsData.dailySavingsBalance, selectedView);
-                setDailySavingsBalanceChartData(newData);
-                setSelectedView(selectedView);
-            }
+        if (!dateLastSignedIn) {
+            fetchDataFromDB();
+            localStorage.setItem("dateLastSignedIn", TODAY);
+            return
         }
 
-        fetchData();
+        if (dateLastSignedIn === TODAY) {
+            fetchDataFromLocalStorage();
+            return
+        }
+
+        if (dateLastSignedIn !== TODAY) {
+            fetchDataFromDB();
+            localStorage.setItem("dateLastSignedIn", TODAY);
+            return
+        }
     }, [])
 
+    const fetchDataFromDB = async () => {
+        toast.success("Fetching data from database");
+        const savingsDataObj = await getSavingsData();
+        if (savingsDataObj) {
+            const {
+                dailySavingsBalance: fetchedDailySavingsBalance,
+                savingsGoals: fetchedSavingsGoals,
+                completedGoals: fetchedCompletedGoals
+            } = savingsDataObj;
+            const lastElement = fetchedDailySavingsBalance[fetchedDailySavingsBalance.length - 1];
+            const currentSavingsAmount = lastElement.amount;
+            const undistributedFunds = calculateUndistributedFunds(currentSavingsAmount, fetchedSavingsGoals);
 
-    const changeChartView = (view: ViewKey) => {
-        const newData = transformData(dailySavingsBalanceMasterData, view);
+            setDailySavingsBalanceMasterData(fetchedDailySavingsBalance);
+            setTotalSaved(currentSavingsAmount)
+            setUndistributedFunds(undistributedFunds);
+            setSavingsGoals(fetchedSavingsGoals);
+            setCompletedGoals(fetchedCompletedGoals);
+            changeChartView(fetchedDailySavingsBalance, selectedView);
+
+            setDataToLocalStorage(savingsDataObj);
+        }
+    }
+
+    /**
+     * this function is logically incomplete right now
+     * current issues:
+     * - local storage is not up to date after all interactions
+     *   - interaction types:
+     *     - deposit
+     *     - withdrawal
+     *     - create goal
+     *     - distribute funds
+     *     - complete goal
+     *     - change view
+     */
+    const fetchDataFromLocalStorage = () => {
+        const unparsedSavingsData = localStorage.getItem("savingsData");
+        if (!unparsedSavingsData) {
+            fetchDataFromDB();
+            toast.error("Why is there no data in local storage");
+            return
+        }
+        const savingsData = JSON.parse(unparsedSavingsData);
+        const {
+            dailySavingsBalance: fetchedDailySavingsBalance,
+            savingsGoals: fetchedSavingsGoals,
+            completedGoals: fetchedCompletedGoals
+        } = savingsData;
+        console.log({savingsData})
+        const lastElement = fetchedDailySavingsBalance[fetchedDailySavingsBalance.length - 1];
+        const currentSavingsAmount = lastElement.amount;
+        const undistributedFunds = calculateUndistributedFunds(currentSavingsAmount, fetchedSavingsGoals);
+
+        setDailySavingsBalanceMasterData(fetchedDailySavingsBalance);
+        setTotalSaved(currentSavingsAmount)
+        setUndistributedFunds(undistributedFunds);
+        setSavingsGoals(fetchedSavingsGoals);
+        setCompletedGoals(fetchedCompletedGoals);
+        changeChartView(fetchedDailySavingsBalance, selectedView);
+    }
+
+    const changeChartView = (dailySavingsBalance: DailySavingsBalance[], view: ViewKey) => {
+        const newData = transformData(dailySavingsBalance, view);
         setDailySavingsBalanceChartData(newData);
         setSelectedView(view);
     }
@@ -93,7 +173,7 @@ export default function Home() {
             return data.slice(data.length - getNumberOfDaysPassedInYear());
         } else {
             const days = viewToDaysMap[view];
-            return days ? data.slice(data.length - days) : data; // Fallback to returning original data if view is not recognized
+            return data.slice(data.length - days)
         }
     }
 
