@@ -42,18 +42,6 @@ import toast from "react-hot-toast";
  * - plaid integration
  * - user should be able to deposit savings into different accounts
  *
- * - when the user signs in for the day, check if the last element in the array is the current day
- *
- * PRIORITIES:
- * - savings tracking logic: (in progress)
- *   - save the data array to firebase
- *   - the array will be updated every time a deposit or withdrawal is made
- *   - the array will be used to generate the chart
- *   - totalSaved will be the last element in the array
- *   - each time the user visits the application, check what day it is, and if the last element in the array is not the current day, add a new element to the array with the same value as the last element
- *   - if the last element in the array is the current day, do nothing
- *   - if the user makes a deposit or withdrawal, add a new element to the array with the same value as the last element
- *
  * @constructor
  */
 export default function Home() {

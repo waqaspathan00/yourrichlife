@@ -1,8 +1,9 @@
 import React, {useContext} from 'react';
 import 'chart.js/auto';
 import {Line} from 'react-chartjs-2';
-import {getNumberOfDaysPassedInYear, ViewKey, viewToDaysMap} from "@/lib/utils";
+import {getNumberOfDaysPassedInYear, viewToDaysMap} from "@/lib/utils";
 import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
+import {ViewKey} from "@/lib/types";
 
 interface StepLineChartProps {
     view: ViewKey;
