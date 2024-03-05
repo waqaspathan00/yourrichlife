@@ -22,7 +22,7 @@ export default function DisplayGoalsType({
     const goalDisplayText = goalDisplayType.charAt(0).toUpperCase() + goalDisplayType.slice(1);
     const filteredSavingsGoals = savingsGoals.filter((goal) => goal.type === goalDisplayType);
     const filteredCompletedGoals = completedGoals.filter((goal) => goal.type === goalDisplayType);
-    const [displayCompletedGoals, setDisplayCompletedGoals] = useState(true);
+    const [displayCompletedGoals, setDisplayCompletedGoals] = useState(false);
 
     const toggleCompletedGoalsDisplay = () => {
         setDisplayCompletedGoals(!displayCompletedGoals);
@@ -59,7 +59,7 @@ export default function DisplayGoalsType({
                         ))
                 )}
                 {displayGoals && (
-                    savingsGoals.length > 0 && (
+                    completedGoals.length > 0 && (
                         <div className={"flex flex-col items-center"}>
                             <div className={"flex items-center"}
                                  onClick={() => toggleCompletedGoalsDisplay()}>
