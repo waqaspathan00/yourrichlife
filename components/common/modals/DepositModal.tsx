@@ -5,7 +5,7 @@ import {updateSavingsDoc} from "@/lib/firebase";
 import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
 import {ModalOpenContext} from "@/lib/context/ModalOpenContext";
 import {Goal} from "@/lib/types";
-import {distributeFundsToGoals, updateDataInLocalStorage} from "@/lib/utils";
+import {distributeFundsToGoals} from "@/lib/utils";
 
 export default function DepositModal() {
     const {isDepositModalOpen, setIsDepositModalOpen} = useContext(ModalOpenContext)
@@ -65,9 +65,6 @@ export default function DepositModal() {
         setSavingsGoals(updatedSavingsGoals);
         setUndistributedFunds(updatedUndistributedFunds);
         setIsDepositModalOpen(false);
-
-        updateDataInLocalStorage("savingsGoals", updatedSavingsGoals)
-        updateDataInLocalStorage("dailySavingsBalance", newSavingsBalance)
     };
 
     return (

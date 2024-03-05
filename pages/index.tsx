@@ -11,7 +11,6 @@ import {DailySavingsBalance, ViewKey} from "@/lib/types";
 import {
     calculateUndistributedFunds,
     getNumberOfDaysPassedInYear,
-    setDataToLocalStorage,
     viewToDaysMap
 } from "@/lib/utils";
 import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
@@ -42,15 +41,6 @@ import toast from "react-hot-toast";
  * - plaid integration
  * - user should be able to deposit savings into different accounts
  *
- * daily fetch logic:
- * - start by fetching a property in local storage that contains the last day the user signed in
- * - if the last day the user signed in is not today:
- *   - fetch the data array from firebase
- *   - add a new element to the data array with the same value as the last element
- *   - save the data array to firebase
- *   - update the last day the user signed in in local storage
- * - if the last day the user signed in is today, do nothing
- *
  * - when the user signs in for the day, check if the last element in the array is the current day
  *
  * PRIORITIES:
@@ -67,7 +57,6 @@ import toast from "react-hot-toast";
  */
 export default function Home() {
     const {
-        dailySavingsBalanceMasterData,
         setDailySavingsBalanceMasterData,
         setDailySavingsBalanceChartData,
         setTotalSaved,
@@ -82,22 +71,8 @@ export default function Home() {
         const dateLastSignedIn = localStorage.getItem("dateLastSignedIn");
         const TODAY = new Date().toLocaleDateString();
 
-        if (!dateLastSignedIn) {
-            fetchDataFromDB();
-            localStorage.setItem("dateLastSignedIn", TODAY);
-            return
-        }
-
-        if (dateLastSignedIn === TODAY) {
-            fetchDataFromLocalStorage();
-            return
-        }
-
-        if (dateLastSignedIn !== TODAY) {
-            fetchDataFromDB();
-            localStorage.setItem("dateLastSignedIn", TODAY);
-            return
-        }
+        fetchDataFromDB();
+        localStorage.setItem("dateLastSignedIn", TODAY);
     }, [])
 
     const fetchDataFromDB = async () => {
@@ -119,8 +94,6 @@ export default function Home() {
             setSavingsGoals(fetchedSavingsGoals);
             setCompletedGoals(fetchedCompletedGoals);
             changeChartView(fetchedDailySavingsBalance, selectedView);
-
-            setDataToLocalStorage(savingsDataObj);
         }
     }
 
