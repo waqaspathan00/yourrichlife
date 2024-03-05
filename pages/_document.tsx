@@ -4,6 +4,12 @@ export default function Document() {
     return (
         <Html lang="en">
             <Head>
+                <link rel="manifest" href={"/manifest.json"}/>
+                <link rel="manifest" href={"/.well-known/apple-developer-merchantid-domain-association"}/>
+                <link rel={"apple-touch-icon"} href={"/img/icons/180.png"}></link>
+                <link rel="shortcut icon" type="image/jpg" href="/img/icons/180.png"/>
+                <meta name="theme-color" content="#2563EB"/>
+
                 <link rel="preconnect" href="https://fonts.googleapis.com"/>
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin=""/>
                 <link
