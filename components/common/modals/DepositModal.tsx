@@ -47,9 +47,6 @@ export default function DepositModal() {
             const index = newSavingsBalance.findIndex((element) => element.date === enteredDate);
             newSavingsBalance[index].amount += parseInt(amount);
         }
-        if (newSavingsBalance.length > 365) {
-            newSavingsBalance.shift();
-        }
 
         const {remainingFundsToDistribute, updatedSavingsGoals} = distributeFundsToGoals(amount, percentage, priorityGoal, savingsGoals);
         const updatedUndistributedFunds = undistributedFunds - parseInt(amount) + remainingFundsToDistribute

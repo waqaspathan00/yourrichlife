@@ -9,6 +9,7 @@ import WithdrawalButton from "@/components/common/WithdrawalButton";
 import WithdrawalModal from "@/components/common/modals/WithdrawalModal";
 import {DailySavingsBalance, ViewKey} from "@/lib/types";
 import {
+    addNewDayToSavingsBalance,
     calculateUndistributedFunds,
     getNumberOfDaysPassedInYear,
     viewToDaysMap
@@ -68,11 +69,7 @@ export default function Home() {
 
 
     useEffect(() => {
-        const dateLastSignedIn = localStorage.getItem("dateLastSignedIn");
-        const TODAY = new Date().toLocaleDateString();
-
         fetchDataFromDB();
-        localStorage.setItem("dateLastSignedIn", TODAY);
     }, [])
 
     const fetchDataFromDB = async () => {
@@ -85,11 +82,13 @@ export default function Home() {
                 completedGoals: fetchedCompletedGoals
             } = savingsDataObj;
             const lastElement = fetchedDailySavingsBalance[fetchedDailySavingsBalance.length - 1];
-            const currentSavingsAmount = lastElement.amount;
-            const undistributedFunds = calculateUndistributedFunds(currentSavingsAmount, fetchedSavingsGoals);
+            const lastSavingsAmount = lastElement.amount;
+
+            const undistributedFunds = calculateUndistributedFunds(lastSavingsAmount, fetchedSavingsGoals);
+            addNewDayToSavingsBalance(fetchedDailySavingsBalance);
 
             setDailySavingsBalanceMasterData(fetchedDailySavingsBalance);
-            setTotalSaved(currentSavingsAmount)
+            setTotalSaved(lastSavingsAmount)
             setUndistributedFunds(undistributedFunds);
             setSavingsGoals(fetchedSavingsGoals);
             setCompletedGoals(fetchedCompletedGoals);

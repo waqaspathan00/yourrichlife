@@ -20,10 +20,10 @@ export default function GoalDetailsModal({
 
     const handleDeleteGoal = async (id: number) => {
         if (goal.completed) {
-            const updatedCompletedGoals = await deleteGoal(completedGoals, id)
+            const updatedCompletedGoals = await deleteGoal(completedGoals, id, "completed")
             setCompletedGoals(updatedCompletedGoals);
         } else {
-            const updatedSavingsGoals = await deleteGoal(savingsGoals, id)
+            const updatedSavingsGoals = await deleteGoal(savingsGoals, id, "savings")
             setSavingsGoals(updatedSavingsGoals);
         }
     }

@@ -1,4 +1,5 @@
-import {Goal} from "@/lib/types";
+import {DailySavingsBalance, Goal} from "@/lib/types";
+import {updateSavingsDoc} from "@/lib/firebase";
 
 export const mockDailySavingsBalance = [
     {
@@ -1510,6 +1511,29 @@ export const distributeFundsToGoals = (amountToDistribute: string, percentage: s
     });
 
     return {remainingFundsToDistribute: totalAmountToDistribute, updatedSavingsGoals};
+}
+
+export const addNewDayToSavingsBalance = (fetchedDailySavingsBalance: DailySavingsBalance[]) => {
+    const lastElement = fetchedDailySavingsBalance[fetchedDailySavingsBalance.length - 1];
+    const lastSavingsAmount = lastElement.amount;
+    const dateLastSignedIn = localStorage.getItem("dateLastSignedIn");
+
+    const TODAY = new Date().toLocaleDateString();
+    if (!dateLastSignedIn || dateLastSignedIn !== TODAY) {
+        console.log("adding a new day", "dateLastSignedIn", dateLastSignedIn, "TODAY", TODAY)
+        const newElement = {
+            date: TODAY,
+            amount: lastSavingsAmount
+        }
+        fetchedDailySavingsBalance.push(newElement);
+
+        if (fetchedDailySavingsBalance.length > 365) {
+            fetchedDailySavingsBalance.shift();
+        }
+        updateSavingsDoc({dailySavingsBalance: fetchedDailySavingsBalance})
+    }
+
+    localStorage.setItem("dateLastSignedIn", TODAY);
 }
 
 export const setDataToLocalStorage = (savingsDataObj: any) => {
