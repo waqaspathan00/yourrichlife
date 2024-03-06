@@ -36,7 +36,6 @@ import toast from "react-hot-toast";
  * - add a loading spinner when fetching data from database
  * - add dark mode
  *
- * - make savings goals editable
  * - add a circular progress bar to the savings goals
  * - plaid integration
  * - user should be able to deposit savings into different accounts

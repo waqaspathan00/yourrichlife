@@ -25,8 +25,16 @@ export default function GoalDetailsModal({
                                          }: GoalDetailsModalProps) {
     const {setIsEmojiPickerModalOpen} = useContext(ModalOpenContext);
     const {savingsGoals, setSavingsGoals, completedGoals, setCompletedGoals} = useContext(SavingsDataContext);
+    const [name, setName] = useState(goal.name);
     const [amountTarget, setAmountTarget] = React.useState<number>(goal.amountTarget);
     const [emoji, setEmoji] = useState(goal.emoji);
+
+    useEffect(() => {
+        if (name === goal.name) {
+            return;
+        }
+        updateName(name);
+    }, [name]);
 
     useEffect(() => {
         if (amountTarget === goal.amountTarget) {
@@ -52,6 +60,10 @@ export default function GoalDetailsModal({
         }
     }
 
+    const handleChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setName(e.target.value);
+    }
+
     const handleChangeAmountTarget = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.value === "$" || e.target.value === "") {
             setAmountTarget(0);
@@ -61,6 +73,23 @@ export default function GoalDetailsModal({
         const value = e.target.value.replace("$", "");
         setAmountTarget(parseInt(value));
     }
+
+    const updateName = useCallback(
+        debounce(async (name) => {
+            if (goal.completed) {
+                const updatedCompletedGoals = updateGoals(completedGoals, goal.id, "name", name);
+                setCompletedGoals(updatedCompletedGoals);
+                updateSavingsDoc({completedGoals: updatedCompletedGoals});
+                toast.success("Goal name updated");
+            } else {
+                const updatedSavingsGoals = updateGoals(savingsGoals, goal.id, "name", name);
+                setSavingsGoals(updatedSavingsGoals);
+                updateSavingsDoc({savingsGoals: updatedSavingsGoals});
+                toast.success("Goal name updated");
+            }
+        }, 1000),
+        []
+    );
 
     const updateAmountTarget = useCallback(
         debounce(async (amountTarget) => {
@@ -110,7 +139,7 @@ export default function GoalDetailsModal({
             <div className={"flex flex-col items-center mt-4"}>
                 <div className={"flex justify-center w-full items-center"}>
                     <button className={"text-2xl"} onClick={openEmojiModal}>{emoji}</button>
-                    <p className={"capitalize ml-4"}>{goal.name}</p>
+                    <input className={"ml-4"} value={name} onChange={(e) => handleChangeName(e)} />
                 </div>
                 <div className={"flex flex-col w-full"}>
                     <div className={"my-2 overflow-hidden"}>
