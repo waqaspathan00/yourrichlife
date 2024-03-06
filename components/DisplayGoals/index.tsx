@@ -30,7 +30,7 @@ export default function DisplayGoals() {
 
     return (
         <div className={"flex flex-col w-full items-center"}>
-            <h2 className={"text-3xl text-left w-11/12 font-bold"}>Goals</h2>
+            <h2 className={"text-2xl text-left w-11/12 font-bold"}>Goals</h2>
             <UndistributedFundsAlert/>
 
             <DisplayGoalsType goalDisplayType={"necessities"} displayGoals={displayNecessities}

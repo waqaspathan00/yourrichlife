@@ -34,6 +34,8 @@ import toast from "react-hot-toast";
  * - add a sign in screen
  * - more toast notifications
  * - disable vertical scroll on page when interacting with chart
+ * - add a loading spinner when fetching data from database
+ * - add dark mode
  *
  * - make savings goals editable
  * - add a circular progress bar to the savings goals
@@ -107,7 +109,6 @@ export default function Home() {
             savingsGoals: fetchedSavingsGoals,
             completedGoals: fetchedCompletedGoals
         } = savingsData;
-        console.log({savingsData})
         const lastElement = fetchedDailySavingsBalance[fetchedDailySavingsBalance.length - 1];
         const currentSavingsAmount = lastElement.amount;
         const undistributedFunds = calculateUndistributedFunds(currentSavingsAmount, fetchedSavingsGoals);
