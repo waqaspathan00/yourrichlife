@@ -3,6 +3,8 @@ import ProgressBar from "@/components/ProgressBar";
 import GoalDetailsModal from "@/components/common/modals/GoalDetailsModal";
 import {Goal} from "@/lib/types";
 import CompleteGoalModal from "@/components/common/modals/CompleteGoalModal";
+import { CircularProgressbar } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
 
 interface GoalCardProps {
     goal: Goal,
@@ -11,6 +13,7 @@ interface GoalCardProps {
 export default function GoalCard({goal}: GoalCardProps) {
     const [isGoalDetailsModalOpen, setIsGoalDetailsModalOpen] = useState(false);
     const [isCompleteGoalModalOpen, setIsCompleteGoalModalOpen] = useState(false);
+    const percentage = Math.round((goal.amountSaved / goal.amountTarget) * 100);
 
     const openCompleteGoalModal = () => {
         setIsCompleteGoalModalOpen(true);
@@ -28,7 +31,11 @@ export default function GoalCard({goal}: GoalCardProps) {
                         <p className={"capitalize"}>{goal.name}</p>
                     </div>
 
-                    <div className={"flex flex-col w-1/3 mt-4"}>
+                    {/*<div className={"flex w-1/5"}>*/}
+                    {/*    <CircularProgressbar value={percentage} text={`${percentage}%`} />*/}
+                    {/*</div>*/}
+                    {/**/}
+                    <div className={"flex flex-col w-1/3"}>
                         <div className={"overflow-hidden"}>
                             <ProgressBar currentSaved={goal.amountSaved} totalRequired={goal.amountTarget}/>
                         </div>
