@@ -1468,6 +1468,23 @@ export const mockDailySavingsBalance = [
     },
 ]
 
+export const getRandomEmoji = () => {
+    const thingEmojis = [
+    '⌚', '📱', '💻', '⌨️', '🖥️', '🖨️', '🖱️', '🖲️', '🕹️', '🗜️',
+    '💽', '💾', '💿', '📀', '📼', '📷', '📸', '📹', '🎥', '📽️',
+    '🎞️', '📞', '☎️', '📟', '📠', '📺', '📻', '🎙️', '🎚️', '🎛️',
+    '🧭', '🔋', '🔌', '💡', '🔦', '🕯️', '🧯', '🛢️', '💸', '💵',
+    '💴', '💶', '💷', '💰', '💳', '🧾', '💎', '⚖️', '🔧', '🔨',
+    '⚒️', '🛠️', '⛏️', '🔩', '⚙️', '⛓️', '🧰', '🔫', '💣', '🔪',
+    '🗡️', '⚔️', '🛡️', '🚬', '⚰️', '🪦', '🚿', '🛁', '🪒', '🧴',
+    '🧷', '🧹', '🧺', '🧻', '🧼', '🧽', '🧯', '🛎️', '🔑', '🗝️',
+    '🚪', '🛋️', '🪑', '🚽', '🚿', '🛁', '🪒', '🧴', '🧷', '🧹'
+  ];
+
+  const randomIndex = Math.floor(Math.random() * thingEmojis.length);
+  return thingEmojis[randomIndex];
+}
+
 export const getNumberOfDaysPassedInYear = () => {
     const today = new Date();
     const firstDayOfYear = new Date(today.getFullYear(), 0, 1);
@@ -1534,6 +1551,16 @@ export const addNewDayToSavingsBalance = (fetchedDailySavingsBalance: DailySavin
     }
 
     localStorage.setItem("dateLastSignedIn", TODAY);
+}
+
+export function updateGoals<T extends keyof Goal>(savingsGoals: Goal[], goalId: number, key: T, value: Goal[T]): Goal[] {
+    const updatedSavingsGoals = savingsGoals.map((savingsGoal) => {
+        if (savingsGoal.id === goalId) {
+            savingsGoal[key] = value;
+        }
+        return savingsGoal;
+    })
+    return updatedSavingsGoals;
 }
 
 export const setDataToLocalStorage = (savingsDataObj: any) => {

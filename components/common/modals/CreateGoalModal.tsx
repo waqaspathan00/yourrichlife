@@ -1,7 +1,7 @@
 import React, {useState, useContext} from "react"
 import Modal from "@/components/common/modals/Modal";
 import {updateSavingsDoc} from "@/lib/firebase";
-import {generateId} from "@/lib/utils";
+import {generateId, getRandomEmoji} from "@/lib/utils";
 import {ModalOpenContext} from "@/lib/context/ModalOpenContext";
 import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
 import EmojiPickerModal from "@/components/common/modals/EmojiPickerModal";
@@ -12,7 +12,7 @@ export default function CreateGoalModal() {
     const {savingsGoals, setSavingsGoals} = useContext(SavingsDataContext);
     const [name, setName] = useState("");
     const [amount, setAmount] = useState(0);
-    const [emoji, setEmoji] = useState("💰")
+    const [emoji, setEmoji] = useState(getRandomEmoji());
 
     const goalModalTypeText = createGoalModalType === "necessities" ? "Necessity" : "Want";
 
@@ -45,7 +45,7 @@ export default function CreateGoalModal() {
         setAmount(0);
     }
 
-    const openModal = () => {
+    const openEmojiModal = () => {
         setIsEmojiPickerModalOpen(true);
     }
 
@@ -54,7 +54,7 @@ export default function CreateGoalModal() {
             <div className={"bg-white rounded-lg"}>
                 <h2 className={"text-center text-xl font-bold mb-4"}>Create {goalModalTypeText} Goal</h2>
                 <div className={"space-y-4"}>
-                    <button className={"text-2xl text-center w-full"} onClick={openModal}>{emoji}</button>
+                    <button className={"text-2xl text-center w-full"} onClick={openEmojiModal}>{emoji}</button>
                     <div className={"flex flex-col"}>
                         <label htmlFor="name">
                             Name

@@ -1,9 +1,15 @@
 import {Goal} from "@/lib/types";
 import Modal from "@/components/common/modals/Modal";
 import ProgressBar from "@/components/ProgressBar";
-import React, {useContext} from "react";
-import {deleteGoal} from "@/lib/firebase";
+import React, {useCallback, useContext, useEffect, useState} from "react";
+import {deleteGoal, updateSavingsDoc} from "@/lib/firebase";
 import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
+import debounce from "lodash.debounce"
+import toast from "react-hot-toast";
+import {updateGoals} from "@/lib/utils";
+import EmojiPicker from "emoji-picker-react";
+import {ModalOpenContext} from "@/lib/context/ModalOpenContext";
+import EmojiPickerModal from "@/components/common/modals/EmojiPickerModal";
 
 interface GoalDetailsModalProps {
     goal: Goal;
@@ -16,7 +22,24 @@ export default function GoalDetailsModal({
                                              isGoalDetailsModalOpen,
                                              setIsGoalDetailsModalOpen
                                          }: GoalDetailsModalProps) {
+    const {setIsEmojiPickerModalOpen} = useContext(ModalOpenContext);
     const {savingsGoals, setSavingsGoals, completedGoals, setCompletedGoals} = useContext(SavingsDataContext);
+    const [amountTarget, setAmountTarget] = React.useState<number>(goal.amountTarget);
+    const [emoji, setEmoji] = useState(goal.emoji);
+
+    useEffect(() => {
+        if (amountTarget === goal.amountTarget) {
+            return;
+        }
+        updateAmountTarget(amountTarget);
+    }, [amountTarget]);
+
+    useEffect(() => {
+        if (emoji === goal.emoji) {
+            return;
+        }
+        updateEmoji(emoji);
+    }, [emoji]);
 
     const handleDeleteGoal = async (id: number) => {
         if (goal.completed) {
@@ -28,12 +51,58 @@ export default function GoalDetailsModal({
         }
     }
 
+    const handleChangeAmountTarget = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.value === "$" || e.target.value === "") {
+            setAmountTarget(0);
+            return
+        }
+
+        const value = e.target.value.replace("$", "");
+        setAmountTarget(parseInt(value));
+    }
+
+    const updateAmountTarget = useCallback(
+        debounce(async (amountTarget) => {
+            if (goal.completed) {
+                const updatedCompletedGoals = updateGoals(completedGoals, goal.id, "amountTarget", amountTarget);
+                setCompletedGoals(updatedCompletedGoals);
+                updateSavingsDoc({completedGoals: updatedCompletedGoals});
+                toast.success("Goal amount target updated");
+            } else {
+                const updatedSavingsGoals = updateGoals(savingsGoals, goal.id, "amountTarget", amountTarget);
+                setSavingsGoals(updatedSavingsGoals);
+                updateSavingsDoc({savingsGoals: updatedSavingsGoals});
+                toast.success("Goal amount target updated");
+            }
+        }, 1000),
+        []
+    );
+
+    const updateEmoji = useCallback(
+        debounce(async (emoji) => {
+            if (goal.completed) {
+                const updatedCompletedGoals = updateGoals(completedGoals, goal.id, "emoji", emoji);
+                setCompletedGoals(updatedCompletedGoals);
+                toast.success("Goal emoji updated");
+            } else {
+                const updatedSavingsGoals = updateGoals(savingsGoals, goal.id, "emoji", emoji);
+                setSavingsGoals(updatedSavingsGoals);
+                toast.success("Goal emoji updated");
+            }
+        }, 1000),
+        []
+    );
+
+    const openEmojiModal = () => {
+        setIsEmojiPickerModalOpen(true);
+    }
+
     return (
         <Modal isModalOpen={isGoalDetailsModalOpen} setIsModalOpen={setIsGoalDetailsModalOpen}>
             <div className={"flex flex-col items-center"}>
-                <div className={"flex items-center"}>
-                    <div className={"text-2xl"}>{goal.emoji}</div>
-                    <p className={"capitalize text-xl ml-4"}>{goal.name}</p>
+                <div className={"flex justify-start w-full items-center border-2"}>
+                    <button className={"text-2xl"} onClick={openEmojiModal}>{emoji}</button>
+                    <p className={"capitalize ml-4"}>{goal.name}</p>
                 </div>
                 <div className={"flex flex-col w-full"}>
                     <div className={"my-2 overflow-hidden"}>
@@ -41,11 +110,14 @@ export default function GoalDetailsModal({
                     </div>
                     <div className={"flex justify-between"}>
                         <p className={""}>${goal.amountSaved}</p>
-                        <p>${goal.amountTarget}</p>
+                        <input className={"w-1/4 text-right"} value={`$${amountTarget}`}
+                               onChange={(e) => handleChangeAmountTarget(e)}/>
                     </div>
                 </div>
                 <button onClick={() => handleDeleteGoal(goal.id)}>Delete</button>
             </div>
+
+            <EmojiPickerModal emoji={emoji} setEmoji={setEmoji}/>
         </Modal>
     )
 }
