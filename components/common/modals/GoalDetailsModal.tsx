@@ -7,9 +7,10 @@ import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
 import debounce from "lodash.debounce"
 import toast from "react-hot-toast";
 import {updateGoals} from "@/lib/utils";
-import EmojiPicker from "emoji-picker-react";
 import {ModalOpenContext} from "@/lib/context/ModalOpenContext";
 import EmojiPickerModal from "@/components/common/modals/EmojiPickerModal";
+import { SlOptionsVertical } from "react-icons/sl";
+import { MdDelete } from "react-icons/md";
 
 interface GoalDetailsModalProps {
     goal: Goal;
@@ -99,8 +100,15 @@ export default function GoalDetailsModal({
 
     return (
         <Modal isModalOpen={isGoalDetailsModalOpen} setIsModalOpen={setIsGoalDetailsModalOpen}>
-            <div className={"flex flex-col items-center"}>
-                <div className={"flex justify-start w-full items-center border-2"}>
+            {/*<button className={"absolute top-5 left-4"}>*/}
+            {/*    <SlOptionsVertical size={20}/>*/}
+            {/*</button>*/}
+            <button className={"absolute top-4 left-4 text-red-500"} onClick={() => handleDeleteGoal(goal.id)}>
+                <MdDelete size={24}/>
+            </button>
+
+            <div className={"flex flex-col items-center mt-4"}>
+                <div className={"flex justify-center w-full items-center"}>
                     <button className={"text-2xl"} onClick={openEmojiModal}>{emoji}</button>
                     <p className={"capitalize ml-4"}>{goal.name}</p>
                 </div>
@@ -114,7 +122,6 @@ export default function GoalDetailsModal({
                                onChange={(e) => handleChangeAmountTarget(e)}/>
                     </div>
                 </div>
-                <button onClick={() => handleDeleteGoal(goal.id)}>Delete</button>
             </div>
 
             <EmojiPickerModal emoji={emoji} setEmoji={setEmoji}/>
