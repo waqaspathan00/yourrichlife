@@ -41,7 +41,7 @@ export default function DisplayGoalsType({
                     </h3>
                 </div>
                 <div onClick={() => openCreateGoalModal(goalDisplayType)} className={"flex items-center text-blue-600"}>
-                    <button className={"text-lg "}>add</button>
+                    <button className={""}>add</button>
                     <IoIosArrowForward className={"ml-1"}/>
                 </div>
             </div>

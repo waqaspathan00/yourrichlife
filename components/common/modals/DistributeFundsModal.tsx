@@ -14,21 +14,21 @@ import {distributeFundsToGoals} from "@/lib/utils";
 export default function DistributeFundsModal() {
     const {savingsGoals, setSavingsGoals, undistributedFunds, setUndistributedFunds} = useContext(SavingsDataContext);
     const {isDistributeFundsModalOpen, setIsDistributeFundsModalOpen} = useContext(ModalOpenContext);
-    const [amount, setAmount] = useState("");
+    const [distributionAmount, setDistributionAmount] = useState(0);
     const [priorityGoal, setPriorityGoal] = useState("");
-    const [percentage, setPercentage] = useState("");
+    const [percentageInt, setPercentageInt] = useState(100);
 
     /**
      * totalAmountToDistribute will be the amount the user enters and will be decremented as we distribute to each goal
      */
     const handleDistributeFunds = () => {
-        const {remainingFundsToDistribute, updatedSavingsGoals} = distributeFundsToGoals(amount, percentage, priorityGoal, savingsGoals);
+        const {remainingFundsToDistribute, updatedSavingsGoals} = distributeFundsToGoals(distributionAmount, percentageInt, priorityGoal, savingsGoals);
 
         const newSavingsData = {
             savingsGoals: updatedSavingsGoals
         };
 
-        const updatedUndistributedFunds = undistributedFunds - (parseInt(amount) - remainingFundsToDistribute)
+        const updatedUndistributedFunds = undistributedFunds - distributionAmount + remainingFundsToDistribute
 
         updateSavingsDoc(newSavingsData)
         setSavingsGoals(updatedSavingsGoals);
@@ -47,7 +47,7 @@ export default function DistributeFundsModal() {
                     </label>
                     <input className={"border-2 p-2 rounded-md"} type="number" id="amount" name="amount"
                            placeholder={"Amount"}
-                           value={amount} onChange={(e) => setAmount(e.target.value)}/>
+                           value={distributionAmount} onChange={(e) => setDistributionAmount(parseInt(e.target.value))}/>
                 </div>
                 <div className={"flex justify-between space-x-2"}>
                     <div className={"flex flex-col w-3/4"}>
@@ -67,8 +67,8 @@ export default function DistributeFundsModal() {
                             Percentage
                         </label>
                         <input className={"border-2 p-2 rounded-md"} type="number" id="percentage"
-                               name="percentage" value={percentage}
-                               onChange={(e) => setPercentage(e.target.value)}/>
+                               name="percentage" value={percentageInt}
+                               onChange={(e) => setPercentageInt(parseInt(e.target.value))}/>
                     </div>
                 </div>
                 <button className={"bg-blue-600 w-full rounded-full text-lg p-2 text-white"}

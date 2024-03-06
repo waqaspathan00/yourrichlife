@@ -18,7 +18,7 @@ export default function EmojiPickerModal({emoji, setEmoji}: any) {
 
     return (
         <Modal isModalOpen={isEmojiPickerModalOpen} setIsModalOpen={setIsEmojiPickerModalOpen}>
-            <EmojiPicker onEmojiClick={handleEmojiClick}/>
+            <EmojiPicker className={"mt-4"} onEmojiClick={handleEmojiClick}/>
         </Modal>
     )
 }

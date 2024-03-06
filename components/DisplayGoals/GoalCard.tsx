@@ -24,8 +24,8 @@ export default function GoalCard({goal}: GoalCardProps) {
                 <div className={"flex justify-between"}
                      onClick={() => setIsGoalDetailsModalOpen(true)}>
                     <div className={"flex items-center"}>
-                        <div className={"text-2xl"}>{goal.emoji}</div>
-                        <p className={"capitalize text-xl ml-4"}>{goal.name}</p>
+                        <div className={"text-2xl mr-2"}>{goal.emoji}</div>
+                        <p className={"capitalize"}>{goal.name}</p>
                     </div>
 
                     <div className={"flex flex-col w-1/3 mt-4"}>

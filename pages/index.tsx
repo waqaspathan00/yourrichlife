@@ -34,9 +34,9 @@ import toast from "react-hot-toast";
  * - add a sign in screen
  * - make savings goals editable
  * - more toast notifications
- * - deploy to vercel
- * - make into PWA
- * - fix all build issues
+ * - disable vertical scroll on page when interacting with chart
+ * - make goal selection for distribute and deposit modals with headless ui
+ * - if percentage input is empty then nan gets calculated for goals
  *
  * - add a circular progress bar to the savings goals
  * - plaid integration
@@ -138,7 +138,7 @@ export default function Home() {
     }
 
     return (
-        <main className="flex flex-col items-center relative disable-scroll">
+        <main className="flex flex-col items-center relative disable-scroll pb-16">
             <Header/>
             <SavingsChart selectedView={selectedView}
                           changeChartView={changeChartView}/>

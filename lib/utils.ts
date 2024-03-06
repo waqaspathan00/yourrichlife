@@ -1481,9 +1481,9 @@ export const calculateUndistributedFunds = (currentSavingsAmount: number, fetche
     return currentSavingsAmount - fetchedSavingsGoals.reduce((acc: number, goal: Goal) => acc + goal.amountSaved, 0);
 }
 
-export const distributeFundsToGoals = (amountToDistribute: string, percentage: string, priorityGoal: string, fetchedSavingsGoals: Goal[]) => {
-    let totalAmountToDistribute = parseInt(amountToDistribute);
-    const priorityPercentage = parseInt(percentage) / 100;
+export const distributeFundsToGoals = (amountToDistribute: number, percentage: number, priorityGoal: string, fetchedSavingsGoals: Goal[]) => {
+    let totalAmountToDistribute = amountToDistribute
+    const priorityPercentage = percentage / 100;
     const priorityDistributionAmount = totalAmountToDistribute * priorityPercentage;
     const postPriorityDistributionAmount = totalAmountToDistribute - priorityDistributionAmount;
 

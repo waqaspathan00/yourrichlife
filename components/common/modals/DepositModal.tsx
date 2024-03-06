@@ -18,9 +18,9 @@ export default function DepositModal() {
         setUndistributedFunds
     } = useContext(SavingsDataContext);
     const [savingsDate, setSavingsDate] = useState(new Date());  // remove this field, no longer asking for it
-    const [amount, setAmount] = useState("");
+    const [depositAmount, setDepositAmount] = useState(0);
     const [priorityGoal, setPriorityGoal] = useState("");
-    const [percentage, setPercentage] = useState("");
+    const [percentageInt, setPercentageInt] = useState(100);
 
     /**
      * when the user adds a new savings transaction:
@@ -35,21 +35,21 @@ export default function DepositModal() {
      *   - we should be adding a new row when the user signs in for the day
      *   - if we update a savings value from the past that means we are changing history and have to update all future values
      */
-    const addSavingsTransaction = async (savingsDate: Date, amount: string, priorityGoal: string, percentage: string) => {
+    const addSavingsTransaction = async () => {
         const newSavingsBalance = [...dailySavingsBalanceMasterData];
         const lastElement = newSavingsBalance[newSavingsBalance.length - 1];
         const lastElementDate = new Date(lastElement.date).toLocaleDateString()
         const enteredDate = savingsDate.toLocaleDateString();
         const TODAY = new Date().toLocaleDateString();
         if (lastElementDate === TODAY && enteredDate === TODAY) {
-            newSavingsBalance[newSavingsBalance.length - 1].amount += parseInt(amount);
+            newSavingsBalance[newSavingsBalance.length - 1].amount += depositAmount;
         } else {
             const index = newSavingsBalance.findIndex((element) => element.date === enteredDate);
-            newSavingsBalance[index].amount += parseInt(amount);
+            newSavingsBalance[index].amount += depositAmount;
         }
 
-        const {remainingFundsToDistribute, updatedSavingsGoals} = distributeFundsToGoals(amount, percentage, priorityGoal, savingsGoals);
-        const updatedUndistributedFunds = undistributedFunds - parseInt(amount) + remainingFundsToDistribute
+        const {remainingFundsToDistribute, updatedSavingsGoals} = distributeFundsToGoals(depositAmount, percentageInt, priorityGoal, savingsGoals);
+        const updatedUndistributedFunds = undistributedFunds - depositAmount + remainingFundsToDistribute
 
         const newSavingsData = {
             dailySavingsBalance: newSavingsBalance,
@@ -76,7 +76,7 @@ export default function DepositModal() {
                     </label>
                     <input className={"border-2 p-2 rounded-md"} type="number" id="amount" name="amount"
                            placeholder={"Amount"}
-                           value={amount} onChange={(e) => setAmount(e.target.value)}/>
+                           value={depositAmount} onChange={(e) => setDepositAmount(parseInt(e.target.value))}/>
                 </div>
                 <div className={"flex justify-between space-x-2"}>
                     <div className={"flex flex-col w-3/4"}>
@@ -96,12 +96,12 @@ export default function DepositModal() {
                             Percentage
                         </label>
                         <input className={"border-2 p-2 rounded-md"} type="number" id="percentage"
-                               name="percentage" value={percentage}
-                               onChange={(e) => setPercentage(e.target.value)}/>
+                               name="percentage" value={percentageInt}
+                               onChange={(e) => setPercentageInt(parseInt(e.target.value))}/>
                     </div>
                 </div>
                 <button className={"bg-blue-600 w-full rounded-full text-lg p-2 text-white"}
-                        onClick={() => addSavingsTransaction(savingsDate, amount, priorityGoal, percentage)}
+                        onClick={addSavingsTransaction}
                         type="submit">
                     Deposit
                 </button>
