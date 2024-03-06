@@ -29,16 +29,22 @@ import toast from "react-hot-toast";
  *
  * for next time:
  * - add form validation logic to all modals
- * - add ability to read a csv file of savings data and transform it into the data array
- * - add a sign in screen
  * - more toast notifications
  * - disable vertical scroll on page when interacting with chart
  * - add a loading spinner when fetching data from database
  * - add dark mode
+ * - recurring deposits
  *
  * - add a circular progress bar to the savings goals
- * - plaid integration
  * - user should be able to deposit savings into different accounts
+ *
+ * accounts feature:
+ *   - user can deposit savings into different accounts
+ *   - total amount saved will be the sum of all accounts
+ *   - savings chart must summate the daily value of all accounts, then display the chart
+ *   - user can distribute funds to goals from any account
+ *   - user can withdraw from any account
+ *
  *
  * @constructor
  */

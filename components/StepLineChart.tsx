@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useEffect, useRef} from 'react';
 import 'chart.js/auto';
 import {Line} from 'react-chartjs-2';
 import {getNumberOfDaysPassedInYear, viewToDaysMap} from "@/lib/utils";
@@ -10,8 +10,36 @@ interface StepLineChartProps {
 }
 
 const StepLineChart = ({view}: StepLineChartProps) => {
+    // test if this works on mobile or not
+    const chartRef = useRef<HTMLDivElement>(null);
     const {dailySavingsBalanceChartData} = useContext(SavingsDataContext);
     const dailyAmounts = dailySavingsBalanceChartData.map((day) => day.amount);
+
+    useEffect(() => {
+        const chartElement = chartRef.current;
+
+        const handleMouseEnter = () => {
+            // Disable vertical scrolling
+            document.body.style.overflowY = 'hidden';
+        };
+
+        const handleMouseLeave = () => {
+            // Enable vertical scrolling
+            document.body.style.overflowY = 'auto';
+        };
+
+        if (chartElement) {
+            chartElement.addEventListener('mouseenter', handleMouseEnter);
+            chartElement.addEventListener('mouseleave', handleMouseLeave);
+        }
+
+        return () => {
+            if (chartElement) {
+                chartElement.removeEventListener('mouseenter', handleMouseEnter);
+                chartElement.removeEventListener('mouseleave', handleMouseLeave);
+            }
+        };
+    }, []);
 
     // this block of code can be optimized
     let labels;
@@ -97,7 +125,7 @@ const StepLineChart = ({view}: StepLineChartProps) => {
     };
 
     return (
-        <div>
+        <div ref={chartRef}>
             {/* @ts-ignore */}
             <Line data={chartData} options={options}/>
         </div>
