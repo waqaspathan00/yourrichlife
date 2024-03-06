@@ -1,11 +1,10 @@
 import React, {useContext, useState} from "react"
 import Modal from "@/components/common/modals/Modal";
-import DatePickerTailwind from "@/components/common/DatePicker";
 import {updateSavingsDoc} from "@/lib/firebase";
 import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
 import {ModalOpenContext} from "@/lib/context/ModalOpenContext";
-import {Goal} from "@/lib/types";
 import {distributeFundsToGoals} from "@/lib/utils";
+import PriorityGoalPicker from "@/components/common/PriorityGoalPicker";
 
 export default function DepositModal() {
     const {isDepositModalOpen, setIsDepositModalOpen} = useContext(ModalOpenContext)
@@ -83,13 +82,7 @@ export default function DepositModal() {
                         <label htmlFor="goal">
                             Priority Goal
                         </label>
-                        <select className={"border-2 p-2 h-full rounded-md"} name="goal" id="goal" value={priorityGoal}
-                                onChange={(e) => setPriorityGoal(e.target.value)}>
-                            <option value={"none"}>None</option>
-                            {savingsGoals.map((goal: any) => (
-                                <option value={goal.name}>{goal.name}</option>
-                            ))}
-                        </select>
+                        <PriorityGoalPicker savingsGoals={savingsGoals} priorityGoal={priorityGoal} setPriorityGoal={setPriorityGoal}/>
                     </div>
                     <div className={"flex flex-col w-1/4"}>
                         <label htmlFor="percentage">

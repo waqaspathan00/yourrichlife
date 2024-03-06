@@ -27,7 +27,7 @@ export default function Modal({ isModalOpen, setIsModalOpen, children }: ModalPr
                     <div className="fixed inset-0 bg-black/25" />
                 </Transition.Child>
                 <div className="fixed inset-0 overflow-y-auto">
-                    <div className="mt-8 flex min-h-full items-center justify-center p-4 text-center">
+                    <div className="flex min-h-full border-2 items-center justify-center p-4 text-center">
                         <Transition.Child
                             as={Fragment}
                             enter="ease-out duration-300"
@@ -37,7 +37,7 @@ export default function Modal({ isModalOpen, setIsModalOpen, children }: ModalPr
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <Dialog.Panel className="inline-block w-11/12 transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all lg:w-1/3">
+                            <Dialog.Panel className="inline-block w-11/12 transform rounded-2xl bg-white text-left align-middle shadow-xl transition-all lg:w-1/3">
                                 <IoClose
                                     size={32}
                                     onClick={() => closeModal()}

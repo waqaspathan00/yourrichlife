@@ -32,12 +32,10 @@ import toast from "react-hot-toast";
  * - add form validation logic to all modals
  * - add ability to read a csv file of savings data and transform it into the data array
  * - add a sign in screen
- * - make savings goals editable
  * - more toast notifications
  * - disable vertical scroll on page when interacting with chart
- * - make goal selection for distribute and deposit modals with headless ui
- * - if percentage input is empty then nan gets calculated for goals
  *
+ * - make savings goals editable
  * - add a circular progress bar to the savings goals
  * - plaid integration
  * - user should be able to deposit savings into different accounts

@@ -1,10 +1,10 @@
-import React, {useState, useEffect, useContext} from "react"
+import React, {useState, useContext} from "react"
 import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
 import Modal from "@/components/common/modals/Modal";
 import {ModalOpenContext} from "@/lib/context/ModalOpenContext";
 import {updateSavingsDoc} from "@/lib/firebase";
-import {Goal} from "@/lib/types";
 import {distributeFundsToGoals} from "@/lib/utils";
+import PriorityGoalPicker from "@/components/common/PriorityGoalPicker";
 
 /**
  * in this modal the user will be able to distribute funds to their savings goals
@@ -54,13 +54,7 @@ export default function DistributeFundsModal() {
                         <label htmlFor="goal">
                             Priority Goal
                         </label>
-                        <select className={"border-2 p-2 h-full rounded-md"} name="goal" id="goal" value={priorityGoal}
-                                onChange={(e) => setPriorityGoal(e.target.value)}>
-                            <option value={"none"}>None</option>
-                            {savingsGoals.map((goal: Goal) => (
-                                <option value={goal.name}>{goal.name}</option>
-                            ))}
-                        </select>
+                        <PriorityGoalPicker savingsGoals={savingsGoals} priorityGoal={priorityGoal} setPriorityGoal={setPriorityGoal}/>
                     </div>
                     <div className={"flex flex-col w-1/4"}>
                         <label htmlFor="percentage">
