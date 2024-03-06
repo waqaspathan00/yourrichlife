@@ -11,7 +11,7 @@ interface SavingsChartProps {
 export default function SavingsChart({selectedView, changeChartView}: SavingsChartProps) {
 
     return (
-        <div className={"w-11/12 bg-white rounded-lg mt-4 p-4 shadow-lg"}>
+        <div className={"w-11/12 absolute top-28 bg-white rounded-lg mt-4 p-4 shadow-lg"}>
             <StepLineChart view={selectedView}/>
             <div className={"flex w-full rounded-lg"}>
                 <ChangeChartViewButton view={"1M"} selectedView={selectedView} changeChartView={changeChartView}/>

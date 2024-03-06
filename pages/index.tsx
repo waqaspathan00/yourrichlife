@@ -142,7 +142,7 @@ export default function Home() {
             <SavingsChart selectedView={selectedView}
                           changeChartView={changeChartView}/>
 
-            <div className={"flex w-11/12 my-4 space-x-4"}>
+            <div className={"flex w-11/12 mt-44 mb-4 space-x-4"}>
                 <WithdrawalButton/>
                 <DepositButton/>
             </div>
