@@ -1,5 +1,6 @@
 import {DailySavingsBalance, Goal, ViewKey} from "@/lib/types";
 import {updateSavingsDoc} from "@/lib/firebase";
+import toast from "react-hot-toast";
 
 export const mockDailySavingsBalance = [
     {
@@ -1530,14 +1531,23 @@ export const distributeFundsToGoals = (amountToDistribute: number, percentage: n
     return {remainingFundsToDistribute: totalAmountToDistribute, updatedSavingsGoals};
 }
 
+/**
+ * Adds a new day to the dailySavingsBalance array based on 3 conditions:
+ *  - if the user has not signed in before
+ *  - when the last sign in date is not today
+ *  - when the date of the last element in the array is not today
+ *
+ * @param fetchedDailySavingsBalance
+ */
 export const addNewDayToSavingsBalance = (fetchedDailySavingsBalance: DailySavingsBalance[]) => {
     const lastElement = fetchedDailySavingsBalance[fetchedDailySavingsBalance.length - 1];
+    const lastSavingsDate = lastElement.date;
     const lastSavingsAmount = lastElement.amount;
     const dateLastSignedIn = localStorage.getItem("dateLastSignedIn");
 
     const TODAY = new Date().toLocaleDateString();
-    if (!dateLastSignedIn || dateLastSignedIn !== TODAY) {
-        console.log("adding a new day", "dateLastSignedIn", dateLastSignedIn, "TODAY", TODAY)
+    if (!dateLastSignedIn || dateLastSignedIn !== TODAY || lastSavingsDate !== TODAY) {
+        toast.success(`adding a new day", "dateLastSignedIn", ${dateLastSignedIn}, "TODAY", ${TODAY}`)
         const newElement = {
             date: TODAY,
             amount: lastSavingsAmount
@@ -1554,13 +1564,12 @@ export const addNewDayToSavingsBalance = (fetchedDailySavingsBalance: DailySavin
 }
 
 export function updateGoals<T extends keyof Goal>(savingsGoals: Goal[], goalId: number, key: T, value: Goal[T]): Goal[] {
-    const updatedSavingsGoals = savingsGoals.map((savingsGoal) => {
+    return savingsGoals.map((savingsGoal) => {
         if (savingsGoal.id === goalId) {
             savingsGoal[key] = value;
         }
         return savingsGoal;
-    })
-    return updatedSavingsGoals;
+    });
 }
 
 export const transformChartData = (data: any, view: ViewKey) => {

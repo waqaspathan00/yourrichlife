@@ -18,7 +18,7 @@ export default function DepositButton() {
 
     return (
         <button onClick={openDepositModal}
-                className="bg-gray-800 w-full rounded-lg p-4 text-lg cursor-pointer hover:bg-green-600 text-white">
+                className="bg-gray-800 w-full rounded-lg p-4 cursor-pointer hover:bg-green-600 text-white">
             + Deposit</button>
     )
 }

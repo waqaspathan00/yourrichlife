@@ -36,7 +36,7 @@ export default function DisplayGoalsType({
                         className={`${displayGoals ? "rotate-180" : "rotate-90"} text-xs cursor-pointer mr-4 text-gray-300`}>
                         <BsTriangleFill/>
                     </div>
-                    <h3 className={"text-lg"}>
+                    <h3>
                         {goalDisplayText}
                     </h3>
                 </div>
