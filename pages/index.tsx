@@ -11,8 +11,7 @@ import {DailySavingsBalance, ViewKey} from "@/lib/types";
 import {
     addNewDayToSavingsBalance,
     calculateUndistributedFunds,
-    getNumberOfDaysPassedInYear,
-    viewToDaysMap
+    transformChartData
 } from "@/lib/utils";
 import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
 import DistributeFundsModal from "@/components/common/modals/DistributeFundsModal";
@@ -122,18 +121,9 @@ export default function Home() {
     }
 
     const changeChartView = (dailySavingsBalance: DailySavingsBalance[], view: ViewKey) => {
-        const newData = transformData(dailySavingsBalance, view);
+        const newData = transformChartData(dailySavingsBalance, view);
         setDailySavingsBalanceChartData(newData);
         setSelectedView(view);
-    }
-
-    const transformData = (data: any, view: ViewKey) => {
-        if (view === 'YTD') {
-            return data.slice(data.length - getNumberOfDaysPassedInYear());
-        } else {
-            const days = viewToDaysMap[view];
-            return data.slice(data.length - days)
-        }
     }
 
     return (

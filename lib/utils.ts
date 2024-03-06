@@ -1,4 +1,4 @@
-import {DailySavingsBalance, Goal} from "@/lib/types";
+import {DailySavingsBalance, Goal, ViewKey} from "@/lib/types";
 import {updateSavingsDoc} from "@/lib/firebase";
 
 export const mockDailySavingsBalance = [
@@ -1470,19 +1470,19 @@ export const mockDailySavingsBalance = [
 
 export const getRandomEmoji = () => {
     const thingEmojis = [
-    '⌚', '📱', '💻', '⌨️', '🖥️', '🖨️', '🖱️', '🖲️', '🕹️', '🗜️',
-    '💽', '💾', '💿', '📀', '📼', '📷', '📸', '📹', '🎥', '📽️',
-    '🎞️', '📞', '☎️', '📟', '📠', '📺', '📻', '🎙️', '🎚️', '🎛️',
-    '🧭', '🔋', '🔌', '💡', '🔦', '🕯️', '🧯', '🛢️', '💸', '💵',
-    '💴', '💶', '💷', '💰', '💳', '🧾', '💎', '⚖️', '🔧', '🔨',
-    '⚒️', '🛠️', '⛏️', '🔩', '⚙️', '⛓️', '🧰', '🔫', '💣', '🔪',
-    '🗡️', '⚔️', '🛡️', '🚬', '⚰️', '🪦', '🚿', '🛁', '🪒', '🧴',
-    '🧷', '🧹', '🧺', '🧻', '🧼', '🧽', '🧯', '🛎️', '🔑', '🗝️',
-    '🚪', '🛋️', '🪑', '🚽', '🚿', '🛁', '🪒', '🧴', '🧷', '🧹'
-  ];
+        '⌚', '📱', '💻', '⌨️', '🖥️', '🖨️', '🖱️', '🖲️', '🕹️', '🗜️',
+        '💽', '💾', '💿', '📀', '📼', '📷', '📸', '📹', '🎥', '📽️',
+        '🎞️', '📞', '☎️', '📟', '📠', '📺', '📻', '🎙️', '🎚️', '🎛️',
+        '🧭', '🔋', '🔌', '💡', '🔦', '🕯️', '🧯', '🛢️', '💸', '💵',
+        '💴', '💶', '💷', '💰', '💳', '🧾', '💎', '⚖️', '🔧', '🔨',
+        '⚒️', '🛠️', '⛏️', '🔩', '⚙️', '⛓️', '🧰', '🔫', '💣', '🔪',
+        '🗡️', '⚔️', '🛡️', '🚬', '⚰️', '🪦', '🚿', '🛁', '🪒', '🧴',
+        '🧷', '🧹', '🧺', '🧻', '🧼', '🧽', '🧯', '🛎️', '🔑', '🗝️',
+        '🚪', '🛋️', '🪑', '🚽', '🚿', '🛁', '🪒', '🧴', '🧷', '🧹'
+    ];
 
-  const randomIndex = Math.floor(Math.random() * thingEmojis.length);
-  return thingEmojis[randomIndex];
+    const randomIndex = Math.floor(Math.random() * thingEmojis.length);
+    return thingEmojis[randomIndex];
 }
 
 export const getNumberOfDaysPassedInYear = () => {
@@ -1561,6 +1561,15 @@ export function updateGoals<T extends keyof Goal>(savingsGoals: Goal[], goalId: 
         return savingsGoal;
     })
     return updatedSavingsGoals;
+}
+
+export const transformChartData = (data: any, view: ViewKey) => {
+    if (view === 'YTD') {
+        return data.slice(data.length - getNumberOfDaysPassedInYear());
+    } else {
+        const days = viewToDaysMap[view];
+        return data.slice(data.length - days)
+    }
 }
 
 export const setDataToLocalStorage = (savingsDataObj: any) => {
