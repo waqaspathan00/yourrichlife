@@ -19,12 +19,10 @@ const StepLineChart = ({view}: StepLineChartProps) => {
         const chartElement = chartRef.current;
 
         const handleMouseEnter = () => {
-            // Disable vertical scrolling
             document.body.style.overflowY = 'hidden';
         };
 
         const handleMouseLeave = () => {
-            // Enable vertical scrolling
             document.body.style.overflowY = 'auto';
         };
 
@@ -59,7 +57,7 @@ const StepLineChart = ({view}: StepLineChartProps) => {
                 borderColor: '#3B66FF',
                 borderWidth: 2,
                 fill: true,
-                stepped: true,
+                stepped: false,
                 // stepped: false,
             },
         ],
@@ -114,11 +112,11 @@ const StepLineChart = ({view}: StepLineChartProps) => {
         },
         elements: {
             line: {
-                tension: 1, // Adds some curve to the line
+                tension: 0, // Adds some curve to the line
                 // display: true
             },
             point: {
-                radius: 0.1
+                radius: 0.0
             }
         },
         maintainAspectRatio: false, // Add this to control aspect ratio

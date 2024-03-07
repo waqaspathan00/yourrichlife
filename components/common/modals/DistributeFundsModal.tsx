@@ -5,6 +5,7 @@ import {ModalOpenContext} from "@/lib/context/ModalOpenContext";
 import {updateSavingsDoc} from "@/lib/firebase";
 import {distributeFundsToGoals} from "@/lib/utils";
 import PriorityGoalPicker from "@/components/common/PriorityGoalPicker";
+import toast from "react-hot-toast";
 
 /**
  * in this modal the user will be able to distribute funds to their savings goals
@@ -12,11 +13,11 @@ import PriorityGoalPicker from "@/components/common/PriorityGoalPicker";
  * the user will be able to select a priority goal and a percentage of the total amount to distribute to that goal
  */
 export default function DistributeFundsModal() {
-    const {savingsGoals, setSavingsGoals, undistributedFunds, setUndistributedFunds} = useContext(SavingsDataContext);
+    const {savingsGoals, setSavingsGoals, undistributedFunds, setUndistributedFunds, totalSaved} = useContext(SavingsDataContext);
     const {isDistributeFundsModalOpen, setIsDistributeFundsModalOpen} = useContext(ModalOpenContext);
     const [distributionAmount, setDistributionAmount] = useState(0);
-    const [priorityGoal, setPriorityGoal] = useState("");
-    const [percentageInt, setPercentageInt] = useState(100);
+    const [priorityGoal, setPriorityGoal] = useState("None");
+    const [percentageInt, setPercentageInt] = useState(0);
 
     /**
      * totalAmountToDistribute will be the amount the user enters and will be decremented as we distribute to each goal
@@ -36,6 +37,38 @@ export default function DistributeFundsModal() {
         setIsDistributeFundsModalOpen(false);
     }
 
+    const handleChangeAmount = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = parseInt(e.target.value);
+        if (value < 0) {
+            setDistributionAmount(0);
+        } else if (value > totalSaved) {
+            toast.error("You cannot distribute more than you have saved");
+            setDistributionAmount(totalSaved);
+        } else {
+            setDistributionAmount(value);
+        }
+    }
+
+    const handleChangePriorityGoal = (goal: string) => {
+        setPriorityGoal(goal);
+        if (percentageInt === 0) {
+            setPercentageInt(100);
+        } else if (goal === "None") {
+            setPercentageInt(0);
+        }
+    }
+
+    const handleChangePercentage = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = parseInt(e.target.value);
+        if (value > 100) {
+            setPercentageInt(100);
+        } else if (value < 0) {
+            setPercentageInt(0);
+        } else {
+            setPercentageInt(value);
+        }
+    }
+
     return (
         <Modal isModalOpen={isDistributeFundsModalOpen} setIsModalOpen={setIsDistributeFundsModalOpen}>
             <h2 className={"text-center text-xl font-bold"}>Distribute Funds</h2>
@@ -47,14 +80,14 @@ export default function DistributeFundsModal() {
                     </label>
                     <input className={"border-2 p-2 rounded-md"} type="number" id="amount" name="amount"
                            placeholder={"Amount"}
-                           value={distributionAmount} onChange={(e) => setDistributionAmount(parseInt(e.target.value))}/>
+                           value={distributionAmount} onChange={handleChangeAmount}/>
                 </div>
                 <div className={"flex justify-between space-x-2"}>
                     <div className={"flex flex-col w-3/4"}>
                         <label htmlFor="goal">
                             Priority Goal
                         </label>
-                        <PriorityGoalPicker savingsGoals={savingsGoals} priorityGoal={priorityGoal} setPriorityGoal={setPriorityGoal}/>
+                        <PriorityGoalPicker savingsGoals={savingsGoals} priorityGoal={priorityGoal} handleChangePriorityGoal={handleChangePriorityGoal}/>
                     </div>
                     <div className={"flex flex-col w-1/4"}>
                         <label htmlFor="percentage">
@@ -62,7 +95,7 @@ export default function DistributeFundsModal() {
                         </label>
                         <input className={"border-2 p-2 rounded-md"} type="number" id="percentage"
                                name="percentage" value={percentageInt}
-                               onChange={(e) => setPercentageInt(parseInt(e.target.value))}/>
+                               onChange={handleChangePercentage}/>
                     </div>
                 </div>
                 <button className={"bg-blue-600 w-full rounded-full text-lg p-2 text-white"}

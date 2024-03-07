@@ -1,5 +1,6 @@
 import React, {useContext} from "react"
 import {ModalOpenContext} from "@/lib/context/ModalOpenContext";
+import DepositModal from "@/components/common/modals/DepositModal";
 
 /**
  * This component is a button that allows the user to deposit money into their account
@@ -17,8 +18,13 @@ export default function DepositButton() {
     }
 
     return (
-        <button onClick={openDepositModal}
-                className="bg-gray-800 w-full rounded-lg p-4 cursor-pointer hover:bg-green-600 text-white">
-            + Deposit</button>
+        <>
+            <button onClick={openDepositModal}
+                    className="bg-gray-800 w-full rounded-lg p-4 cursor-pointer hover:bg-green-600 text-white">
+                + Deposit
+            </button>
+
+            <DepositModal/>
+        </>
     )
 }

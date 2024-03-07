@@ -1,13 +1,12 @@
 import React, {useContext, useEffect, useState} from "react";
 import CreateGoalModal from "@/components/common/modals/CreateGoalModal";
-import DepositModal from "@/components/common/modals/DepositModal";
 import Header from "@/components/Header";
 import SavingsChart from "@/components/common/SavingsChart";
 import {getSavingsData} from "@/lib/firebase";
 import DepositButton from "@/components/DepositButton";
 import WithdrawalButton from "@/components/common/WithdrawalButton";
 import WithdrawalModal from "@/components/common/modals/WithdrawalModal";
-import {DailySavingsBalance, ViewKey} from "@/lib/types";
+import {ViewKey} from "@/lib/types";
 import {
     addNewDayToSavingsBalance,
     calculateUndistributedFunds,
@@ -40,7 +39,7 @@ import toast from "react-hot-toast";
  *
  * accounts feature:
  *   - user can deposit savings into different accounts
- *   - total amount saved will be the sum of all accounts
+ *   - dailySavingsBalance will be the sum of all accounts
  *   - savings chart must summate the daily value of all accounts, then display the chart
  *   - user can distribute funds to goals from any account
  *   - user can withdraw from any account
@@ -151,7 +150,6 @@ export default function Home() {
 const DisplayModals = () => {
     return (
         <>
-            <DepositModal/>
             <WithdrawalModal/>
             <CreateGoalModal/>
             <DistributeFundsModal/>
