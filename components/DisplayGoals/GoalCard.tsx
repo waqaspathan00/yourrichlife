@@ -40,7 +40,7 @@ export default function GoalCard({goal}: GoalCardProps) {
                             <ProgressBar currentSaved={goal.amountSaved} totalRequired={goal.amountTarget}/>
                         </div>
                         <div className={"flex justify-between"}>
-                            <p className={""}>${goal.amountSaved}</p>
+                            <p className={""}>${Math.floor(goal.amountSaved)}</p>
                             <p>${goal.amountTarget}</p>
                         </div>
                     </div>

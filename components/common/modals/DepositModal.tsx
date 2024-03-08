@@ -6,6 +6,8 @@ import {ModalOpenContext} from "@/lib/context/ModalOpenContext";
 import {calculateUndistributedFunds, distributeFundsToGoals} from "@/lib/utils";
 import PriorityGoalPicker from "@/components/common/PriorityGoalPicker";
 import toast from "react-hot-toast";
+import {AccountsDataContext} from "@/lib/context/AccountsDataContext";
+import SavingsAccountPicker from "@/components/common/SavingsAccountPicker";
 
 export default function DepositModal() {
     const {isDepositModalOpen, setIsDepositModalOpen} = useContext(ModalOpenContext)
@@ -17,24 +19,16 @@ export default function DepositModal() {
         undistributedFunds,
         setUndistributedFunds
     } = useContext(SavingsDataContext);
+    const {
+        accountsList,
+        setAccountsList
+    } = useContext(AccountsDataContext);
     const [savingsDate, setSavingsDate] = useState(new Date());  // remove this field, no longer asking for it
     const [depositAmount, setDepositAmount] = useState(0);
     const [priorityGoal, setPriorityGoal] = useState("None");
     const [percentageInt, setPercentageInt] = useState(0);
+    const [accountName, setAccountName] = useState("None");
 
-    /**
-     * when the user adds a new savings transaction:
-     * - add the amount to the dailySavingsBalance array, first check the date entered by the user
-     *   - if the date of the last element in the array is today AND the user entered todays date, add the amount to the last element
-     *   - if the user entered a date that is not today, update the correct element in the array with the new amount
-     *   - if the array has more than 365 elements, remove the first element
-     * - update the totalSaved state with the new total amount saved
-     * - distribute to the savings goals that the user has set up
-     *
-     * - this logic is still flawed:
-     *   - we should be adding a new row when the user signs in for the day
-     *   - if we update a savings value from the past that means we are changing history and have to update all future values
-     */
     const addSavingsTransaction = async () => {
         const newSavingsBalance = [...dailySavingsBalanceMasterData];
         const lastElement = newSavingsBalance[newSavingsBalance.length - 1];
@@ -53,14 +47,23 @@ export default function DepositModal() {
             remainingFundsToDistribute,
             updatedSavingsGoals
         } = distributeFundsToGoals(depositAmount, percentageInt, priorityGoal, savingsGoals);
-        const updatedUndistributedFunds = undistributedFunds - depositAmount + remainingFundsToDistribute
-        // const updatedUndistributedFunds = calculateUndistributedFunds(lastSavingsAmount, updatedSavingsGoals);
+        // const updatedUndistributedFunds = undistributedFunds - depositAmount + remainingFundsToDistribute
+        const updatedUndistributedFunds = calculateUndistributedFunds(lastSavingsAmount, updatedSavingsGoals);
+
+        if (accountName !== "None") {
+            const updatedAccountsList = accountsList.map((account) => {
+                if (account.name === accountName) {
+                    account.balance += depositAmount;
+                }
+                return account;
+            });
+            setAccountsList(updatedAccountsList);
+        }
 
         const newSavingsData = {
             dailySavingsBalance: newSavingsBalance,
             savingsGoals: updatedSavingsGoals
         };
-
         updateSavingsDoc(newSavingsData)
 
         setTotalSaved(newSavingsBalance[newSavingsBalance.length - 1].amount);
@@ -98,6 +101,10 @@ export default function DepositModal() {
         }
     }
 
+    const handleChangeAccount = (accountName: string) => {
+        setAccountName(accountName);
+    }
+
     return (
         <Modal isModalOpen={isDepositModalOpen} setIsModalOpen={setIsDepositModalOpen}>
             <h2 className={"text-center text-xl font-bold"}>Add Savings</h2>
@@ -128,6 +135,13 @@ export default function DepositModal() {
                                name="percentage" value={percentageInt}
                                onChange={handleChangePercentage}/>
                     </div>
+                </div>
+                <div className={"flex flex-col w-full"}>
+                    <label htmlFor="account">
+                        Account
+                    </label>
+                    <SavingsAccountPicker accountName={accountName} accountsList={accountsList}
+                                          handleChangeAccount={handleChangeAccount}/>
                 </div>
                 <button className={"bg-blue-600 w-full rounded-full text-lg p-2 text-white"}
                         onClick={addSavingsTransaction}

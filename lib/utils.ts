@@ -1495,6 +1495,13 @@ export const getNumberOfDaysPassedInYear = () => {
     return day + 1;
 }
 
+/**
+ * Calculates the amount of funds that have not been distributed to any savings goals
+ * formula: currentSavingsAmount - sum of all amountSaved in fetchedSavingsGoals
+ *
+ * @param currentSavingsAmount - the current amount of savings
+ * @param fetchedSavingsGoals - the savings goals fetched from the database
+ */
 export const calculateUndistributedFunds = (currentSavingsAmount: number, fetchedSavingsGoals: Goal[]) => {
     return currentSavingsAmount - fetchedSavingsGoals.reduce((acc: number, goal: Goal) => acc + goal.amountSaved, 0);
 }
@@ -1509,7 +1516,7 @@ export const distributeFundsToGoals = (amountToDistribute: number, percentage: n
         .filter((goal: Goal) => goal.name !== priorityGoal)
         .filter((goal: Goal) => goal.amountSaved < goal.amountTarget)
         .length;
-    const amountPerGoal = postPriorityDistributionAmount / numNonPriorityGoals;
+    const amountPerGoal = Math.round(postPriorityDistributionAmount / numNonPriorityGoals * 100) / 100;
     const updatedSavingsGoals = fetchedSavingsGoals.map((goal: Goal) => {
         if (goal.name === priorityGoal) {
             if (goal.amountSaved + priorityDistributionAmount > goal.amountTarget) {
