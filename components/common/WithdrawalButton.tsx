@@ -10,7 +10,7 @@ export default function WithdrawalButton() {
 
     return (
         <button onClick={openWithdrawalModal}
-                className="bg-white w-full rounded-lg p-4 whitespace-no-wrap cursor-pointer hover:bg-red-500">
+                className="bg-white w-full rounded-lg p-4 whitespace-no-wrap cursor-pointer hover:bg-red-500 hover:text-white">
             - Withdraw</button>
     )
 }

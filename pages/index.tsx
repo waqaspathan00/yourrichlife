@@ -16,6 +16,7 @@ import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
 import DistributeFundsModal from "@/components/common/modals/DistributeFundsModal";
 import DisplayGoals from "@/components/DisplayGoals";
 import toast from "react-hot-toast";
+import {AccountsDataContext} from "@/lib/context/AccountsDataContext";
 
 
 /**
@@ -28,11 +29,14 @@ import toast from "react-hot-toast";
  *
  * for next time:
  * - add form validation logic to all modals
+ *   - dont allow user to enter percntage greater than 100
+ *   - dont allow user to enter an amount greater than they have
+ *
  * - more toast notifications
- * - disable vertical scroll on page when interacting with chart
  * - add a loading spinner when fetching data from database
  * - add dark mode
  * - recurring deposits
+ * - recalculate undistributed funds when a deposit is made
  *
  * - add a circular progress bar to the savings goals
  * - user should be able to deposit savings into different accounts
@@ -44,11 +48,11 @@ import toast from "react-hot-toast";
  *   - user can distribute funds to goals from any account
  *   - user can withdraw from any account
  *
- *
  * @constructor
  */
 export default function Home() {
     const {
+        dailySavingsBalanceMasterData,
         setDailySavingsBalanceMasterData,
         setDailySavingsBalanceChartData,
         setTotalSaved,
@@ -56,11 +60,15 @@ export default function Home() {
         setSavingsGoals,
         setCompletedGoals
     } = useContext(SavingsDataContext);
+    const {
+        setAccountsList,
+    } = useContext(AccountsDataContext);
     const [selectedView, setSelectedView] = useState<ViewKey>('3M'); // Default view
 
-
     useEffect(() => {
-        fetchDataFromDB();
+        if (!dailySavingsBalanceMasterData.length) {
+            fetchDataFromDB();
+        }
     }, [])
 
     const fetchDataFromDB = async () => {
@@ -70,27 +78,31 @@ export default function Home() {
             const {
                 dailySavingsBalance: fetchedDailySavingsBalance,
                 savingsGoals: fetchedSavingsGoals,
-                completedGoals: fetchedCompletedGoals
+                completedGoals: fetchedCompletedGoals,
+                accounts: fetchedAccounts
             } = savingsDataObj;
             const lastElement = fetchedDailySavingsBalance[fetchedDailySavingsBalance.length - 1];
             const lastSavingsAmount = lastElement.amount;
 
-            const undistributedFunds = calculateUndistributedFunds(lastSavingsAmount, fetchedSavingsGoals);
+            const updatedUndistributedFunds = calculateUndistributedFunds(lastSavingsAmount, fetchedSavingsGoals);
             addNewDayToSavingsBalance(fetchedDailySavingsBalance);
 
             setDailySavingsBalanceMasterData(fetchedDailySavingsBalance);
             setTotalSaved(lastSavingsAmount)
-            setUndistributedFunds(undistributedFunds);
+            setUndistributedFunds(updatedUndistributedFunds);
             setSavingsGoals(fetchedSavingsGoals);
             setCompletedGoals(fetchedCompletedGoals);
-            changeChartView(fetchedDailySavingsBalance, selectedView);
+            setAccountsList(fetchedAccounts);
+
+            const newData = transformChartData(fetchedDailySavingsBalance, selectedView);
+            setDailySavingsBalanceChartData(newData);
         }
     }
 
     /**
      * this function is logically incomplete right now
      * current issues:
-     * - local storage is not up to date after all interactions
+     * - local storage is not up-to-date after all interactions
      *   - interaction types:
      *     - deposit
      *     - withdrawal
@@ -121,20 +133,13 @@ export default function Home() {
         setUndistributedFunds(undistributedFunds);
         setSavingsGoals(fetchedSavingsGoals);
         setCompletedGoals(fetchedCompletedGoals);
-        changeChartView(fetchedDailySavingsBalance, selectedView);
-    }
-
-    const changeChartView = (dailySavingsBalance: DailySavingsBalance[], view: ViewKey) => {
-        const newData = transformChartData(dailySavingsBalance, view);
-        setDailySavingsBalanceChartData(newData);
-        setSelectedView(view);
+        // changeChartView(fetchedDailySavingsBalance, selectedView);
     }
 
     return (
         <main className="flex flex-col items-center relative disable-scroll pb-16">
             <Header/>
-            <SavingsChart selectedView={selectedView}
-                          changeChartView={changeChartView}/>
+            <SavingsChart selectedView={selectedView} setSelectedView={setSelectedView}/>
 
             <div className={"flex w-11/12 mt-44 mb-4 space-x-4"}>
                 <WithdrawalButton/>

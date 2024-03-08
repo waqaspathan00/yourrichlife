@@ -19,4 +19,10 @@ export type SavingsData = {
     completedGoals: Goal[]
 }
 
+export type Account = {
+    name: string,
+    balance: number,
+    color: string
+}
+
 export type ViewKey = '1M' | '3M' | '6M' | '1Y' | 'YTD';

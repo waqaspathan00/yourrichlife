@@ -1,5 +1,5 @@
 import {initializeApp} from "firebase/app";
-import {getFirestore} from "firebase/firestore";
+import {collection, getFirestore, setDoc} from "firebase/firestore";
 import {getAuth, GoogleAuthProvider} from "firebase/auth";
 import {signOut} from "@firebase/auth";
 import toast from "react-hot-toast";
@@ -22,6 +22,12 @@ export const handleSignOut = (router: NextRouter) => {
     });
 };
 
+export const getSavingsData = async () => {
+    const savingsDocRef = doc(db, "savings", "wadia");
+    const savingsDoc = await getDoc(savingsDocRef);
+    return savingsDoc.data();
+}
+
 export const updateSavingsDoc = async (newData: any) => {
     try {
         const savingsDocRef = doc(db, "savings", "wadia");
@@ -32,10 +38,45 @@ export const updateSavingsDoc = async (newData: any) => {
     }
 }
 
-export const getSavingsData = async () => {
+export const getAccountsData = async () => {
+    const accountsDocRef = doc(db, "savings", "wadia", "accounts");
+    const accountsDoc = await getDoc(accountsDocRef);
+    return accountsDoc.data();
+}
+
+/** this current db storage method is not ideal because it will be difficult to query the data */
+// we need to refactor this so we can get the account data for all accounts e
+export const updateAccountsCollection = async (accountName: string, balance: number) => {
     const savingsDocRef = doc(db, "savings", "wadia");
     const savingsDoc = await getDoc(savingsDocRef);
-    return savingsDoc.data();
+    const data = savingsDoc.data();
+    if (!data) {
+        throw new Error("No data found");
+    }
+
+    const accountNames = data.accountNames;
+    const newAccountNames = [...accountNames, accountName];
+    const newAccount = {
+        name: accountName,
+        dailySavingsBalance: [balance],
+    }
+    await updateSavingsDoc({accountNames: newAccountNames});
+
+    const newAccountDocRef = doc(db, "savings", "wadia", "accounts", accountName);
+    await setDoc(newAccountDocRef, newAccount);
+    // return newAccounts;
+}
+
+export const setAccountsCollectionExample = async () => {
+    const savingsData = await getSavingsData();
+    if (!savingsData) {
+        throw new Error("No data found");
+    }
+    const dailySavingsBalance = savingsData.dailySavingsBalance;
+    const newAccountDocRef = doc(db, "savings", "wadia", "accounts", "chase");
+    await setDoc(newAccountDocRef, {
+        dailySavingsBalance: dailySavingsBalance
+    });
 }
 
 export const completeGoal = async (savingsGoals: Goal[], completedGoals: Goal[], id: number) => {

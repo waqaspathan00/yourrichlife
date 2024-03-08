@@ -2,13 +2,22 @@ import React, {useContext} from "react"
 import StepLineChart from "@/components/StepLineChart";
 import {DailySavingsBalance, ViewKey} from "@/lib/types";
 import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
+import {transformChartData} from "@/lib/utils";
 
 interface SavingsChartProps {
     selectedView: ViewKey;
-    changeChartView: (dailySavingsBalance: DailySavingsBalance[], view: ViewKey) => void;
+    setSelectedView: (view: ViewKey) => void;
+    // changeChartView: (dailySavingsBalance: DailySavingsBalance[], view: ViewKey) => void;
 }
 
-export default function SavingsChart({selectedView, changeChartView}: SavingsChartProps) {
+export default function SavingsChart({selectedView, setSelectedView}: SavingsChartProps) {
+    const {setDailySavingsBalanceChartData} = useContext(SavingsDataContext);
+
+    const changeChartView = (dailySavingsBalance: DailySavingsBalance[], view: ViewKey) => {
+        const newData = transformChartData(dailySavingsBalance, view);
+        setDailySavingsBalanceChartData(newData);
+        setSelectedView(view);
+    }
 
     return (
         <div className={"w-11/12 absolute top-28 bg-white rounded-lg mt-4 p-4 shadow-lg"}>
