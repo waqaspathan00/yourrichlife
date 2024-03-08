@@ -23,7 +23,7 @@ export default function DepositModal() {
         accountsList,
         setAccountsList
     } = useContext(AccountsDataContext);
-    const [savingsDate, setSavingsDate] = useState(new Date());  // remove this field, no longer asking for it
+    const TODAY = new Date().toLocaleDateString();
     const [depositAmount, setDepositAmount] = useState(0);
     const [priorityGoal, setPriorityGoal] = useState("None");
     const [percentageInt, setPercentageInt] = useState(0);
@@ -32,23 +32,16 @@ export default function DepositModal() {
     const addSavingsTransaction = async () => {
         const newSavingsBalance = [...dailySavingsBalanceMasterData];
         const lastElement = newSavingsBalance[newSavingsBalance.length - 1];
-        const lastElementDate = new Date(lastElement.date).toLocaleDateString()
         const lastSavingsAmount = lastElement.amount;
-        const enteredDate = savingsDate.toLocaleDateString();
-        const TODAY = new Date().toLocaleDateString();
-        if (lastElementDate === TODAY && enteredDate === TODAY) {
-            newSavingsBalance[newSavingsBalance.length - 1].amount += depositAmount;
-        } else {
-            const index = newSavingsBalance.findIndex((element) => element.date === enteredDate);
-            newSavingsBalance[index].amount += depositAmount;
-        }
+        const updatedTotalSavings = lastSavingsAmount + depositAmount;
+        newSavingsBalance[newSavingsBalance.length - 1].amount = updatedTotalSavings;
 
         const {
             remainingFundsToDistribute,
             updatedSavingsGoals
         } = distributeFundsToGoals(depositAmount, percentageInt, priorityGoal, savingsGoals);
         // const updatedUndistributedFunds = undistributedFunds - depositAmount + remainingFundsToDistribute
-        const updatedUndistributedFunds = calculateUndistributedFunds(lastSavingsAmount, updatedSavingsGoals);
+        const updatedUndistributedFunds = calculateUndistributedFunds(updatedTotalSavings, updatedSavingsGoals);
 
         if (accountName !== "None") {
             const updatedAccountsList = accountsList.map((account) => {

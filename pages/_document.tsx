@@ -8,7 +8,7 @@ export default function Document() {
                 <link rel="manifest" href={"/.well-known/apple-developer-merchantid-domain-association"}/>
                 <link rel={"apple-touch-icon"} href={"/img/icons/180.png"}></link>
                 <link rel="shortcut icon" type="image/jpg" href="/img/icons/180.png"/>
-                <meta name="theme-color" content="#F3F4F6"/>
+                <meta name="theme-color" content="#2564EB"/>
 
                 <link rel="preconnect" href="https://fonts.googleapis.com"/>
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin=""/>
