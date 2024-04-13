@@ -1,4 +1,4 @@
-import React, {useContext, useState} from "react"
+import React, {useContext, useEffect, useState} from "react"
 import Modal from "@/components/common/modals/Modal";
 import {updateSavingsDoc} from "@/lib/firebase";
 import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
@@ -16,7 +16,6 @@ export default function DepositModal() {
         setTotalSaved,
         savingsGoals,
         setSavingsGoals,
-        undistributedFunds,
         setUndistributedFunds
     } = useContext(SavingsDataContext);
     const {
@@ -29,7 +28,19 @@ export default function DepositModal() {
     const [percentageInt, setPercentageInt] = useState(0);
     const [accountName, setAccountName] = useState("None");
 
+    useEffect(() => {
+        setAccountName(accountsList[0]?.name)
+    }, [accountsList]);
+
     const addSavingsTransaction = async () => {
+        if (depositAmount <= 0) {
+            toast.error("Please enter an amount to deposit");
+            return;
+        } else if (accountName === "None") {
+            toast.error("Please select an account to deposit to");
+            return;
+        }
+
         const newSavingsBalance = [...dailySavingsBalanceMasterData];
         const lastElement = newSavingsBalance[newSavingsBalance.length - 1];
         const lastSavingsAmount = lastElement.amount;
@@ -100,7 +111,7 @@ export default function DepositModal() {
 
     return (
         <Modal isModalOpen={isDepositModalOpen} setIsModalOpen={setIsDepositModalOpen}>
-            <h2 className={"text-center text-xl font-bold"}>Add Savings</h2>
+            <h2 className={"text-center text-xl font-bold"}>Deposit Savings</h2>
             <div className={"space-y-4"}>
                 {/*<DatePickerTailwind savingsDate={savingsDate} setSavingsDate={setSavingsDate}/>*/}
 

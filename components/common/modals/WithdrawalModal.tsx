@@ -1,25 +1,51 @@
-import React, {useContext, useState} from "react"
+import React, {useContext, useEffect, useState} from "react"
 import Modal from "@/components/common/modals/Modal";
 import {updateSavingsDoc} from "@/lib/firebase";
 import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
 import {ModalOpenContext} from "@/lib/context/ModalOpenContext";
+import SavingsAccountPicker from "@/components/common/SavingsAccountPicker";
+import {AccountsDataContext} from "@/lib/context/AccountsDataContext";
+import toast from "react-hot-toast";
 
 export default function WithdrawalModal() {
+    const {
+        setUndistributedFunds
+    } = useContext(SavingsDataContext);
+    const {
+        accountsList,
+    } = useContext(AccountsDataContext);
     const {dailySavingsBalanceMasterData, setTotalSaved} = useContext(SavingsDataContext);
     const {isWithdrawalModalOpen, setIsWithdrawalModalOpen} = useContext(ModalOpenContext);
-    const [amount, setAmount] = useState(0);
+    const [withdrawalAmount, setWithdrawalAmount] = useState(0);
+    const [accountName, setAccountName] = useState("None");
 
+    useEffect(() => {
+        setAccountName(accountsList[0]?.name)
+    }, [accountsList]);
 
     const takeWithdrawal = (amount: number) => {
+        if (withdrawalAmount <= 0) {
+            toast.error("Please enter an amount to deposit");
+            return;
+        } else if (accountName === "None") {
+            toast.error("Please select an account to deposit to");
+            return;
+        }
+
         const newSavingsBalance = [...dailySavingsBalanceMasterData];
         const lastElement = newSavingsBalance[newSavingsBalance.length - 1];
         lastElement.amount -= amount;
-        const newSavingsData = {
+       const newSavingsData = {
             dailySavingsBalance: newSavingsBalance
         };
+
         updateSavingsDoc(newSavingsData)
         setTotalSaved(newSavingsBalance[newSavingsBalance.length - 1].amount);
         setIsWithdrawalModalOpen(false);
+    }
+
+    const handleChangeAccount = (accountName: string) => {
+        setAccountName(accountName);
     }
 
     return (
@@ -32,10 +58,17 @@ export default function WithdrawalModal() {
                     </label>
                     <input className={"border-2 p-2 rounded-md"} type="number" id="amount" name="amount"
                            placeholder={"Amount"}
-                           value={amount} onChange={(e) => setAmount(parseInt(e.target.value))}/>
+                           value={withdrawalAmount} onChange={(e) => setWithdrawalAmount(parseInt(e.target.value))}/>
+                </div>
+                <div className={"flex flex-col w-full"}>
+                    <label htmlFor="account">
+                        Account
+                    </label>
+                    <SavingsAccountPicker accountName={accountName} accountsList={accountsList}
+                                          handleChangeAccount={handleChangeAccount}/>
                 </div>
                 <button className={"bg-blue-600 w-full rounded-full p-2 text-lg text-white"}
-                    onClick={() => takeWithdrawal(amount)}
+                        onClick={() => takeWithdrawal(withdrawalAmount)}
                         type="submit">
                     Withdraw
                 </button>

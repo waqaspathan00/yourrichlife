@@ -1554,7 +1554,7 @@ export const addNewDayToSavingsBalance = (fetchedDailySavingsBalance: DailySavin
 
     const TODAY = new Date().toLocaleDateString();
     if (!dateLastSignedIn || dateLastSignedIn !== TODAY || lastSavingsDate !== TODAY) {
-        toast.success(`adding a new day", "dateLastSignedIn", ${dateLastSignedIn}, "TODAY", ${TODAY}`)
+        // toast.success(`adding a new day", "dateLastSignedIn", ${dateLastSignedIn}, "TODAY", ${TODAY}`)
         const newElement = {
             date: TODAY,
             amount: lastSavingsAmount

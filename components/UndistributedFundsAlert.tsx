@@ -11,6 +11,10 @@ export default function UndistributedFundsAlert() {
         setIsDistributeFundsModalOpen(true);
     }
 
+    if (undistributedFunds === 0) {
+        return <></>
+    }
+
     return (
         <div className={"w-11/12 rounded-lg p-4 bg-white flex items-center justify-between "}>
             <div className={"flex items-center"}>

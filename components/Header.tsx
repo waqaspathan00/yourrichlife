@@ -33,7 +33,7 @@ const ProfileDropdown = () => {
             <Menu.Button className="inline-flex w-full items-center justify-center text-lg text-blue">
                 <IoIosArrowDown size={20} className={"mr-2 text-white"}/>
                 <div className={"border-2 p-1 rounded-full"}>
-                    <img className={"rounded-full w-20 h-20"} src={"/img/prof-pic.png"}/>
+                    <img className={"rounded-full w-20 h-20"} src={"/img/naz-pic.png"}/>
                 </div>
             </Menu.Button>
 

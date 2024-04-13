@@ -35,7 +35,7 @@ export default function CreateAccountModal({isCreateAccountModalOpen, setIsCreat
     const colorChoices = ["bg-red-800", "bg-blue-800", "bg-green-800", "bg-yellow-600", "bg-purple-800", "bg-pink-700"]
 
     const handleCreateAccount = async () => {
-        if (!name || !balance) {
+        if (!name) {
             toast.error("Please fill in all fields");
             return;
         }

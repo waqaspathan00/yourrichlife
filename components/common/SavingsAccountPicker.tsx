@@ -45,19 +45,6 @@ export default function SavingsAccountPicker({
                                 )}
                             </Listbox.Option>
                         ))}
-
-                        <Listbox.Option value={"None"}>
-                            {({active}) => (
-                                <div
-                                    className={`${
-                                        active ? "bg-lightblue" : "text-gray-900"
-                                    } relative cursor-pointer select-none px-4 py-2`}
-                                >
-                                    <span>None</span>
-                                </div>
-                            )}
-                        </Listbox.Option>
-
                     </Listbox.Options>
                 </Transition>
             </div>
