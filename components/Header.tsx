@@ -33,7 +33,7 @@ const ProfileDropdown = () => {
             <Menu.Button className="inline-flex w-full items-center justify-center text-lg text-blue">
                 <IoIosArrowDown size={20} className={"mr-2 text-white"}/>
                 <div className={"border-2 p-1 rounded-full"}>
-                    <img className={"rounded-full w-20 h-20"} src={"/img/naz-pic.png"}/>
+                    <img className={"rounded-full w-20 h-20"} src={"/img/lovely-couple.png"}/>
                 </div>
             </Menu.Button>
 
@@ -78,6 +78,19 @@ const ProfileDropdown = () => {
                                             {active ? <IoCard size={24}/> : <IoCardOutline size={24}/>}
                                         </span>
                                 <span>Accounts</span>
+                            </Link>
+                        )}
+                    </Menu.Item>
+                    <Menu.Item>
+                        {({active, close}: any) => (
+                            <Link
+                                className={`${
+                                    active ? "bg-blue-100" : "text-gray-900"
+                                } flex items-center px-2 py-2`}
+                                href={"https://www.buymeacoffee.com/yourrichlife"}
+                                onClick={close}
+                            >
+                                <img src={"/img/bmc-button.png"} />
                             </Link>
                         )}
                     </Menu.Item>

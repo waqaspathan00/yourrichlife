@@ -8,8 +8,7 @@ interface AccountsDataContextProps {
 
 export const AccountsDataContext = createContext<AccountsDataContextProps>({
     accountsList: [],
-    setAccountsList: () => {
-    }
+    setAccountsList: () => {}
 })
 
 interface AccountsDataProviderProps {
