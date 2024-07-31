@@ -16,7 +16,7 @@ export default function PriorityGoalPicker({
                                            }: PriorityGoalPickerProps) {
     return (
         <Listbox value={priorityGoal} onChange={handleChangePriorityGoal}>
-            <div className="">
+            <div className="z-50">
                 <Listbox.Button
                     className="relative w-full cursor-pointer rounded-lg border-2 bg-white py-2 pl-3 pr-10 text-left ">
                     <span className="block truncate">{priorityGoal}</span>
@@ -32,20 +32,21 @@ export default function PriorityGoalPicker({
                 >
                     <Listbox.Options
                         className="absolute mt-1 overflow-auto rounded-lg bg-white text-base shadow-lg focus:outline-none sm:text-sm">
-                        {savingsGoals.map((goal: Goal) => (
-                            <Listbox.Option value={goal.name}>
-                                {({active}) => (
-                                    <div
-                                        className={`${
-                                            active ? "bg-lightblue" : "text-gray-900"
-                                        } relative cursor-pointer select-none px-4 py-2`}
-                                    >
-                                        <span>{goal.name}</span>
-                                    </div>
-                                )}
-                            </Listbox.Option>
-                        ))}
-
+                        {savingsGoals
+                            .filter(goal => goal.amountSaved < goal.amountTarget)
+                            .map((goal: Goal) => (
+                                <Listbox.Option key={goal.name} value={goal.name}>
+                                    {({ active }) => (
+                                        <div
+                                            className={`${
+                                                active ? "bg-lightblue" : "text-gray-900"
+                                            } relative cursor-pointer select-none px-4 py-2`}
+                                        >
+                                            <span>{goal.name}</span>
+                                        </div>
+                                    )}
+                                </Listbox.Option>
+                            ))}
                         <Listbox.Option value={"None"}>
                             {({active}) => (
                                 <div
