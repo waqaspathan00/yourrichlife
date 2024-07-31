@@ -12,16 +12,26 @@ import UndistributedFundsAlert from "@/components/UndistributedFundsAlert";
 
 export default function DisplayGoals() {
     const {setIsCreateGoalModalOpen, setCreateGoalModalType} = useContext(ModalOpenContext);
-    const [displayNecessities, setDisplayNecessities] = useState(true);
-    const [displayWants, setDisplayWants] = useState(true);
+    const [displayGoalsShortTerm, setDisplayGoalsShortTerm] = useState(true);
+    const [displayGoalsMediumTerm, setDisplayGoalsMediumTerm] = useState(true);
+    const [displayGoalsLongTerm, setDisplayGoalsLongTerm] = useState(true);
 
     const toggleGoalsDisplay = (type: string) => {
-        if (type === 'necessities') {
-            setDisplayNecessities(!displayNecessities);
-        } else {
-            setDisplayWants(!displayWants);
+        switch (type) {
+            case 'ST':
+                setDisplayGoalsShortTerm(!displayGoalsShortTerm);
+                break;
+            case 'MT':
+                setDisplayGoalsMediumTerm(!displayGoalsMediumTerm);
+                break;
+            case 'LT':
+                setDisplayGoalsLongTerm(!displayGoalsLongTerm);
+                break;
+            default:
+                console.log('Invalid Term');
+                break;
         }
-    }
+    };
 
     const openCreateGoalModal = (goalDisplayType: string) => {
         setIsCreateGoalModalOpen(true);
@@ -33,10 +43,13 @@ export default function DisplayGoals() {
             <h2 className={"text-2xl text-left w-11/12 font-bold"}>Goals</h2>
             <UndistributedFundsAlert/>
 
-            <DisplayGoalsType goalDisplayType={"necessities"} displayGoals={displayNecessities}
+            <DisplayGoalsType goalDisplayType={"ST"} displayGoals={displayGoalsShortTerm}
                               toggleGoalsDisplay={toggleGoalsDisplay}
                               openCreateGoalModal={openCreateGoalModal}/>
-            <DisplayGoalsType goalDisplayType={"wants"} displayGoals={displayWants}
+            <DisplayGoalsType goalDisplayType={"MT"} displayGoals={displayGoalsMediumTerm}
+                              toggleGoalsDisplay={toggleGoalsDisplay}
+                              openCreateGoalModal={openCreateGoalModal}/>
+            <DisplayGoalsType goalDisplayType={"LT"} displayGoals={displayGoalsLongTerm}
                               toggleGoalsDisplay={toggleGoalsDisplay}
                               openCreateGoalModal={openCreateGoalModal}/>
         </div>

@@ -19,10 +19,22 @@ export default function DisplayGoalsType({
                                              openCreateGoalModal
                                          }: DisplayGoalsTypeProps) {
     const {savingsGoals, completedGoals} = useContext(SavingsDataContext);
-    const goalDisplayText = goalDisplayType.charAt(0).toUpperCase() + goalDisplayType.slice(1);
     const filteredSavingsGoals = savingsGoals.filter((goal) => goal.type === goalDisplayType);
     const filteredCompletedGoals = completedGoals.filter((goal) => goal.type === goalDisplayType);
     const [displayCompletedGoals, setDisplayCompletedGoals] = useState(false);
+
+    function convertTerm(abbreviation: string) {
+        switch (abbreviation) {
+            case 'LT':
+                return 'Long Term';
+            case 'MT':
+                return 'Medium Term';
+            case 'ST':
+                return 'Short Term';
+            default:
+                return 'Invalid Term';
+        }
+    }
 
     const toggleCompletedGoalsDisplay = () => {
         setDisplayCompletedGoals(!displayCompletedGoals);
@@ -37,7 +49,7 @@ export default function DisplayGoalsType({
                         <BsTriangleFill/>
                     </div>
                     <h3>
-                        {goalDisplayText}
+                        {convertTerm(goalDisplayType)}
                     </h3>
                 </div>
                 <div onClick={() => openCreateGoalModal(goalDisplayType)} className={"flex items-center text-blue-600"}>
@@ -79,8 +91,8 @@ export default function DisplayGoalsType({
                                             No completed goals yet
                                         </div>
                                         : completedGoals.map((goal) => (
-                                        <GoalCard goal={goal}/>
-                                    ))}
+                                            <GoalCard goal={goal}/>
+                                        ))}
                                 </div>
                             )}
                         </div>
