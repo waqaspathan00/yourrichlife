@@ -14,7 +14,7 @@ export default function WithdrawalModal() {
     const {
         accountsList,
     } = useContext(AccountsDataContext);
-    const {dailySavingsBalanceMasterData, setTotalSaved} = useContext(SavingsDataContext);
+    const {dailySavingsBalanceMasterData, totalSaved, setTotalSaved} = useContext(SavingsDataContext);
     const {isWithdrawalModalOpen, setIsWithdrawalModalOpen} = useContext(ModalOpenContext);
     const [withdrawalAmount, setWithdrawalAmount] = useState(0);
     const [accountName, setAccountName] = useState("None");
@@ -44,6 +44,15 @@ export default function WithdrawalModal() {
         setIsWithdrawalModalOpen(false);
     }
 
+    const handleChangeAmount = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = parseInt(e.target.value);
+        if (value > totalSaved){
+            setWithdrawalAmount(totalSaved)
+            return
+        }
+        setWithdrawalAmount(value)
+    }
+
     const handleChangeAccount = (accountName: string) => {
         setAccountName(accountName);
     }
@@ -58,7 +67,7 @@ export default function WithdrawalModal() {
                     </label>
                     <input className={"border-2 p-2 rounded-md"} type="number" id="amount" name="amount"
                            placeholder={"Amount"}
-                           value={withdrawalAmount} onChange={(e) => setWithdrawalAmount(parseInt(e.target.value))}/>
+                           value={withdrawalAmount} onChange={handleChangeAmount}/>
                 </div>
                 <div className={"flex flex-col w-full"}>
                     <label htmlFor="account">
