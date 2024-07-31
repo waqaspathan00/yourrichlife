@@ -17,7 +17,7 @@ export default function DistributeFundsModal() {
     const {isDistributeFundsModalOpen, setIsDistributeFundsModalOpen} = useContext(ModalOpenContext);
     const [distributionAmount, setDistributionAmount] = useState(0);
     const [priorityGoal, setPriorityGoal] = useState("None");
-    const [percentageInt, setPercentageInt] = useState(0);
+    const [percentageInt, setPercentageInt] = useState(100);
 
     /**
      * totalAmountToDistribute will be the amount the user enters and will be decremented as we distribute to each goal
