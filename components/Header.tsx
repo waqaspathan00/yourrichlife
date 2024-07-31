@@ -3,8 +3,10 @@ import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
 import {IoIosArrowDown} from "react-icons/io";
 import {Menu, Transition} from "@headlessui/react";
 import {HiCurrencyDollar, HiOutlineCurrencyDollar} from "react-icons/hi2";
-import {IoCard, IoCardOutline} from "react-icons/io5";
+import {IoCard, IoCardOutline, IoExit, IoExitOutline} from "react-icons/io5";
 import Link from "next/link";
+import {handleSignOut} from "@/lib/firebase";
+import {router} from "next/client";
 
 
 export default function Header() {
@@ -57,10 +59,10 @@ const ProfileDropdown = () => {
                                 href={"/"}
                                 onClick={close}
                             >
-                                        <span className={"mr-2"}>
-                                            {active ? <HiCurrencyDollar size={24}/> :
-                                                <HiOutlineCurrencyDollar size={24}/>}
-                                        </span>
+                                    <span className={"mr-2"}>
+                                        {active ? <HiCurrencyDollar size={24}/> :
+                                            <HiOutlineCurrencyDollar size={24}/>}
+                                    </span>
                                 <span>Goals</span>
                             </Link>
                         )}
@@ -74,10 +76,26 @@ const ProfileDropdown = () => {
                                 href={"/accounts"}
                                 onClick={close}
                             >
-                                        <span className={"mr-2"}>
-                                            {active ? <IoCard size={24}/> : <IoCardOutline size={24}/>}
-                                        </span>
+                                    <span className={"mr-2"}>
+                                        {active ? <IoCard size={24}/> : <IoCardOutline size={24}/>}
+                                    </span>
                                 <span>Accounts</span>
+                            </Link>
+                        )}
+                    </Menu.Item>
+                    <Menu.Item>
+                        {({active, close}: any) => (
+                            <Link
+                                className={`${
+                                    active ? "bg-blue-100" : "text-gray-900"
+                                } flex items-center px-2 py-2`}
+                                href={"/"}
+                                onClick={() => handleSignOut(router)}
+                            >
+                                    <span className={"mr-2"}>
+                                        {active ? <IoExit size={24}/> : <IoExitOutline size={24}/>}
+                                    </span>
+                                <span>Sign out</span>
                             </Link>
                         )}
                     </Menu.Item>

@@ -1,163 +1,99 @@
 import React, {useContext, useEffect, useState} from "react";
-import CreateGoalModal from "@/components/common/modals/CreateGoalModal";
-import Header from "@/components/Header";
-import SavingsChart from "@/components/common/SavingsChart";
-import {getSavingsData} from "@/lib/firebase";
-import DepositButton from "@/components/DepositButton";
-import WithdrawalButton from "@/components/common/WithdrawalButton";
-import WithdrawalModal from "@/components/common/modals/WithdrawalModal";
-import {ViewKey} from "@/lib/types";
-import {
-    addNewDayToSavingsBalance,
-    calculateUndistributedFunds,
-    transformChartData
-} from "@/lib/utils";
-import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
-import DistributeFundsModal from "@/components/common/modals/DistributeFundsModal";
-import DisplayGoals from "@/components/DisplayGoals";
+import { useRouter } from "next/router";
+import { auth } from "@/lib/firebase";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { ContinueWithGoogleButton } from "@/components/AuthButtons";
 import toast from "react-hot-toast";
-import {AccountsDataContext} from "@/lib/context/AccountsDataContext";
+import Link from "next/link";
+import { Input } from "@/components/common/Input";
+import {UserContext} from "@/lib/context/UserContext";
 
-
-/**
- * this will be the home page of the application - "Saved Instead"
- * this application will be a savings tracking application to help users save money
- * the concept of it revolves around the idea of saving money instead of spending it, specifically on things that are not necessary/ impulse purchases
- *
- *  When the user adds a new savings transaction, the amount of that transaction will be distributed to the savings goals that the user has set up
- *  During this process, the user can identify a goal to prioritize and what percentage of the transaction should go to that goal
- *
- * for next time:
- * - add form validation logic to all modals
- *   - dont allow user to enter percntage greater than 100
- *   - dont allow user to enter an amount greater than they have
- *
- * - more toast notifications
- * - add a loading spinner when fetching data from database
- * - add dark mode
- * - recurring deposits
- * - recalculate undistributed funds when a deposit is made
- *
- * - add a circular progress bar to the savings goals
- * - user should be able to deposit savings into different accounts
- *
- * accounts feature:
- *   - user can deposit savings into different accounts
- *   - dailySavingsBalance will be the sum of all accounts
- *   - savings chart must summate the daily value of all accounts, then display the chart
- *   - user can distribute funds to goals from any account
- *   - user can withdraw from any account
- *
- * @constructor
- */
-export default function Home() {
-    const {
-        dailySavingsBalanceMasterData,
-        setDailySavingsBalanceMasterData,
-        setDailySavingsBalanceChartData,
-        setTotalSaved,
-        setUndistributedFunds,
-        setSavingsGoals,
-        setCompletedGoals
-    } = useContext(SavingsDataContext);
-    const {
-        setAccountsList,
-    } = useContext(AccountsDataContext);
-    const [selectedView, setSelectedView] = useState<ViewKey>('3M'); // Default view
+export default function LandingSignInPage() {
+    const { user } = useContext(UserContext);
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const router = useRouter();
 
     useEffect(() => {
-        if (!dailySavingsBalanceMasterData.length) {
-            fetchDataFromDB();
+        if (user){
+            router.push("/goals")
         }
-    }, [])
+    }, [user]);
 
-    const fetchDataFromDB = async () => {
-        toast.success("Fetching data from database");
-        const savingsDataObj = await getSavingsData();
-        if (savingsDataObj) {
-            const {
-                dailySavingsBalance: fetchedDailySavingsBalance,
-                savingsGoals: fetchedSavingsGoals,
-                completedGoals: fetchedCompletedGoals,
-                accounts: fetchedAccounts
-            } = savingsDataObj;
-            const lastElement = fetchedDailySavingsBalance[fetchedDailySavingsBalance.length - 1];
-            const lastSavingsAmount = lastElement.amount;
-
-            const updatedUndistributedFunds = calculateUndistributedFunds(lastSavingsAmount, fetchedSavingsGoals);
-            addNewDayToSavingsBalance(fetchedDailySavingsBalance);
-
-            setDailySavingsBalanceMasterData(fetchedDailySavingsBalance);
-            setTotalSaved(lastSavingsAmount)
-            setUndistributedFunds(updatedUndistributedFunds);
-            setSavingsGoals(fetchedSavingsGoals);
-            setCompletedGoals(fetchedCompletedGoals);
-            setAccountsList(fetchedAccounts);
-
-            const newData = transformChartData(fetchedDailySavingsBalance, selectedView);
-            setDailySavingsBalanceChartData(newData);
+    const handleRegistration = async () => {
+        const isValidEmailRE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email) {
+            toast.error("Please enter your email address");
+            return;
         }
-    }
-
-    /**
-     * this function is logically incomplete right now
-     * current issues:
-     * - local storage is not up-to-date after all interactions
-     *   - interaction types:
-     *     - deposit
-     *     - withdrawal
-     *     - create goal
-     *     - distribute funds
-     *     - complete goal
-     *     - change view
-     */
-    const fetchDataFromLocalStorage = () => {
-        const unparsedSavingsData = localStorage.getItem("savingsData");
-        if (!unparsedSavingsData) {
-            fetchDataFromDB();
-            toast.error("Why is there no data in local storage");
-            return
+        if (!isValidEmailRE.test(email)) {
+            toast.error("Please enter a valid email address");
+            return;
         }
-        const savingsData = JSON.parse(unparsedSavingsData);
-        const {
-            dailySavingsBalance: fetchedDailySavingsBalance,
-            savingsGoals: fetchedSavingsGoals,
-            completedGoals: fetchedCompletedGoals
-        } = savingsData;
-        const lastElement = fetchedDailySavingsBalance[fetchedDailySavingsBalance.length - 1];
-        const currentSavingsAmount = lastElement.amount;
-        const undistributedFunds = calculateUndistributedFunds(currentSavingsAmount, fetchedSavingsGoals);
+        if (!password) {
+            toast.error("Please enter your password");
+            return;
+        }
 
-        setDailySavingsBalanceMasterData(fetchedDailySavingsBalance);
-        setTotalSaved(currentSavingsAmount)
-        setUndistributedFunds(undistributedFunds);
-        setSavingsGoals(fetchedSavingsGoals);
-        setCompletedGoals(fetchedCompletedGoals);
-        // changeChartView(fetchedDailySavingsBalance, selectedView);
-    }
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+            updateProfile(user, { displayName: name });
+            toast.success(`Welcome ${name}`);
+            await router.push("/goals");
+        } catch (error) {
+            console.log(error);
+            toast.error("Unable to create an account.");
+        }
+    };
 
     return (
-        <main className="flex flex-col items-center relative disable-scroll pb-16">
-            <Header/>
-            <SavingsChart selectedView={selectedView} setSelectedView={setSelectedView}/>
+        <div className={"flex w-full flex-col items-center h-screen pt-8"}>
+            <div className={"flex w-11/12 flex-col items-start space-y-2 rounded-2xl bg-white p-8 lg:w-1/3"}>
+                <h2 className={"w-full text-center text-3xl font-bold"}>Register</h2>
 
-            <div className={"flex w-11/12 mt-44 mb-4 space-x-4"}>
-                <WithdrawalButton/>
-                <DepositButton/>
+                <ContinueWithGoogleButton router={router} />
+
+                <span className={"w-full py-4 text-center"}>&mdash; or use your email to register &mdash;</span>
+
+                <Input
+                    label={"name"}
+                    placeholder={"Enter your name"}
+                    value={name}
+                    handleChange={(e) => setName(e.target.value)}
+                />
+                <Input
+                    type={"email"}
+                    label={"email"}
+                    placeholder={"Enter your email"}
+                    value={email}
+                    handleChange={(e) => setEmail(e.target.value)}
+                />
+                <Input
+                    type={"password"}
+                    label={"password"}
+                    placeholder={"Enter your password"}
+                    value={password}
+                    handleChange={(e) => setPassword(e.target.value)}
+                />
+
+                <div className={"w-full pt-4"}>
+                    <button
+                        className={"w-full rounded-full bg-blue-500 p-4 text-white shadow-innerDarkBlue"}
+                        onClick={handleRegistration}
+                    >
+                        Register
+                    </button>
+                </div>
+
+                <p>
+                    Already have an account?&nbsp;
+                    <Link className={"font-bold text-blue"} href={"/signin"}>
+                        Sign in here
+                    </Link>
+                </p>
             </div>
-
-            <DisplayGoals/>
-            <DisplayModals/>
-        </main>
+        </div>
     );
-}
-
-const DisplayModals = () => {
-    return (
-        <>
-            <WithdrawalModal/>
-            <CreateGoalModal/>
-            <DistributeFundsModal/>
-        </>
-    )
 }

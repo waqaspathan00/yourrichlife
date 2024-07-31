@@ -22,15 +22,10 @@ import {AccountsDataContext} from "@/lib/context/AccountsDataContext";
 /**
  * this will be the account page of the application - "Your Rich Life"
  * this application will be a savings tracking application to help users save money
- * the concept of it revolves around the idea of saving money instead of spending it, specifically on things that are not necessary/ impulse purchases
+ * it helps you by visualizing what you are working towards and how comfortably you can achieve your goals
  *
  *  When the user adds a new savings transaction, the amount of that transaction will be distributed to the savings goals that the user has set up
  *  During this process, the user can identify a goal to prioritize and what percentage of the transaction should go to that goal
- *
- * - recalculate undistributed funds when a deposit is made
- *
- * - add a circular progress bar to the savings goals
- * - user should be able to deposit savings into different accounts
  *
  * accounts feature:
  *   - user can deposit savings into different accounts
