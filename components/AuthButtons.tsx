@@ -3,7 +3,7 @@
  */
 import { FC, PropsWithChildren } from "react";
 import { NextRouter } from "next/router";
-import { auth, googleAuthProvider } from "../lib/firebase";
+import {auth, createUserDoc, googleAuthProvider} from "../lib/firebase";
 import toast from "react-hot-toast";
 import { signInWithPopup, signOut } from "@firebase/auth";
 
@@ -14,6 +14,7 @@ type AuthButtonProps = PropsWithChildren<{
 export const ContinueWithGoogleButton = ({ router }: AuthButtonProps) => {
     const signInWithGoogle = async () => {
         signInWithPopup(auth, googleAuthProvider).then((data) => {
+            createUserDoc(data.user?.email);
             toast.success(`Welcome ${data.user?.displayName}`);
         });
         router.push("/");

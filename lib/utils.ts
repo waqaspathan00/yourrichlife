@@ -1,6 +1,5 @@
 import {DailySavingsBalance, Goal, ViewKey} from "@/lib/types";
 import {updateSavingsDoc} from "@/lib/firebase";
-import toast from "react-hot-toast";
 
 export const mockDailySavingsBalance = [
     {
@@ -1546,7 +1545,7 @@ export const distributeFundsToGoals = (amountToDistribute: number, percentage: n
  *
  * @param fetchedDailySavingsBalance
  */
-export const addNewDayToSavingsBalance = (fetchedDailySavingsBalance: DailySavingsBalance[]) => {
+export const addNewDayToSavingsBalance = (fetchedDailySavingsBalance: DailySavingsBalance[], userEmail: string | null | undefined) => {
     const lastElement = fetchedDailySavingsBalance[fetchedDailySavingsBalance.length - 1];
     const lastSavingsDate = lastElement.date;
     const lastSavingsAmount = lastElement.amount;
@@ -1564,7 +1563,7 @@ export const addNewDayToSavingsBalance = (fetchedDailySavingsBalance: DailySavin
         if (fetchedDailySavingsBalance.length > 365) {
             fetchedDailySavingsBalance.shift();
         }
-        updateSavingsDoc({dailySavingsBalance: fetchedDailySavingsBalance})
+        updateSavingsDoc(userEmail, {dailySavingsBalance: fetchedDailySavingsBalance})
     }
 
     localStorage.setItem("dateLastSignedIn", TODAY);

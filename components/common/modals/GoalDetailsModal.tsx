@@ -11,6 +11,7 @@ import {ModalOpenContext} from "@/lib/context/ModalOpenContext";
 import EmojiPickerModal from "@/components/common/modals/EmojiPickerModal";
 import { SlOptionsVertical } from "react-icons/sl";
 import { MdDelete } from "react-icons/md";
+import {UserContext} from "@/lib/context/UserContext";
 
 interface GoalDetailsModalProps {
     goal: Goal;
@@ -23,6 +24,7 @@ export default function GoalDetailsModal({
                                              isGoalDetailsModalOpen,
                                              setIsGoalDetailsModalOpen
                                          }: GoalDetailsModalProps) {
+    const { user } = useContext(UserContext);
     const {setIsEmojiPickerModalOpen} = useContext(ModalOpenContext);
     const {savingsGoals, setSavingsGoals, completedGoals, setCompletedGoals} = useContext(SavingsDataContext);
     const [name, setName] = useState(goal.name);
@@ -52,10 +54,10 @@ export default function GoalDetailsModal({
 
     const handleDeleteGoal = async (id: number) => {
         if (goal.completed) {
-            const updatedCompletedGoals = await deleteGoal(completedGoals, id, "completed")
+            const updatedCompletedGoals = await deleteGoal(completedGoals, id, "completed", user?.email)
             setCompletedGoals(updatedCompletedGoals);
         } else {
-            const updatedSavingsGoals = await deleteGoal(savingsGoals, id, "savings")
+            const updatedSavingsGoals = await deleteGoal(savingsGoals, id, "savings", user?.email)
             setSavingsGoals(updatedSavingsGoals);
         }
     }
@@ -79,12 +81,12 @@ export default function GoalDetailsModal({
             if (goal.completed) {
                 const updatedCompletedGoals = updateGoals(completedGoals, goal.id, "name", name);
                 setCompletedGoals(updatedCompletedGoals);
-                updateSavingsDoc({completedGoals: updatedCompletedGoals});
+                updateSavingsDoc(user?.email, {completedGoals: updatedCompletedGoals});
                 toast.success("Goal name updated");
             } else {
                 const updatedSavingsGoals = updateGoals(savingsGoals, goal.id, "name", name);
                 setSavingsGoals(updatedSavingsGoals);
-                updateSavingsDoc({savingsGoals: updatedSavingsGoals});
+                updateSavingsDoc(user?.email, {savingsGoals: updatedSavingsGoals});
                 toast.success("Goal name updated");
             }
         }, 1000),
@@ -96,12 +98,12 @@ export default function GoalDetailsModal({
             if (goal.completed) {
                 const updatedCompletedGoals = updateGoals(completedGoals, goal.id, "amountTarget", amountTarget);
                 setCompletedGoals(updatedCompletedGoals);
-                updateSavingsDoc({completedGoals: updatedCompletedGoals});
+                updateSavingsDoc(user?.email, {completedGoals: updatedCompletedGoals});
                 toast.success("Goal amount target updated");
             } else {
                 const updatedSavingsGoals = updateGoals(savingsGoals, goal.id, "amountTarget", amountTarget);
                 setSavingsGoals(updatedSavingsGoals);
-                updateSavingsDoc({savingsGoals: updatedSavingsGoals});
+                updateSavingsDoc(user?.email, {savingsGoals: updatedSavingsGoals});
                 toast.success("Goal amount target updated");
             }
         }, 1000),

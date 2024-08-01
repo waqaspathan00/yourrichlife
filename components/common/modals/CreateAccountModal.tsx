@@ -4,6 +4,7 @@ import {updateSavingsDoc} from "@/lib/firebase";
 import {AccountsDataContext} from "@/lib/context/AccountsDataContext";
 import toast from "react-hot-toast";
 import {Account} from "@/lib/types";
+import {UserContext} from "@/lib/context/UserContext";
 
 /**
  * take input for:
@@ -28,6 +29,7 @@ import {Account} from "@/lib/types";
  */
 export default function CreateAccountModal({isCreateAccountModalOpen, setIsCreateAccountModalOpen}: any) {
     // const {savingsGoals, setSavingsGoals, completedGoals, setCompletedGoals} = useContext(SavingsDataContext);
+    const { user } = useContext(UserContext);
     const {accountsList, setAccountsList} = useContext(AccountsDataContext);
     const [name, setName] = useState("");
     const [balance, setBalance] = useState(0);
@@ -50,7 +52,7 @@ export default function CreateAccountModal({isCreateAccountModalOpen, setIsCreat
         setAccountsList(updatedAccountsList);
         setIsCreateAccountModalOpen(false);
 
-        await updateSavingsDoc({accounts: updatedAccountsList});
+        await updateSavingsDoc(user?.email, {accounts: updatedAccountsList});
     }
 
     return (

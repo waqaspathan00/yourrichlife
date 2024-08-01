@@ -6,6 +6,7 @@ import {updateSavingsDoc} from "@/lib/firebase";
 import {distributeFundsToGoals} from "@/lib/utils";
 import PriorityGoalPicker from "@/components/common/PriorityGoalPicker";
 import toast from "react-hot-toast";
+import {UserContext} from "@/lib/context/UserContext";
 
 /**
  * in this modal the user will be able to distribute funds to their savings goals
@@ -14,6 +15,7 @@ import toast from "react-hot-toast";
  */
 export default function DistributeFundsModal() {
     const {savingsGoals, setSavingsGoals, undistributedFunds, setUndistributedFunds, totalSaved} = useContext(SavingsDataContext);
+    const { user } = useContext(UserContext);
     const {isDistributeFundsModalOpen, setIsDistributeFundsModalOpen} = useContext(ModalOpenContext);
     const [distributionAmount, setDistributionAmount] = useState(0);
     const [priorityGoal, setPriorityGoal] = useState("None");
@@ -31,7 +33,7 @@ export default function DistributeFundsModal() {
 
         const updatedUndistributedFunds = undistributedFunds - distributionAmount + remainingFundsToDistribute
 
-        updateSavingsDoc(newSavingsData)
+        updateSavingsDoc(user?.email, newSavingsData)
         setSavingsGoals(updatedSavingsGoals);
         setUndistributedFunds(updatedUndistributedFunds);
         setIsDistributeFundsModalOpen(false);

@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useState} from "react";
 import { useRouter } from "next/router";
-import { auth } from "@/lib/firebase";
+import {auth, createUserDoc} from "@/lib/firebase";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { ContinueWithGoogleButton } from "@/components/AuthButtons";
 import toast from "react-hot-toast";
@@ -40,6 +40,7 @@ export default function LandingSignInPage() {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
             updateProfile(user, { displayName: name });
+            createUserDoc(email);
             toast.success(`Welcome ${name}`);
             await router.push("/goals");
         } catch (error) {

@@ -11,6 +11,7 @@ import {getAccountsData, getSavingsData} from "@/lib/firebase";
 import {addNewDayToSavingsBalance, calculateUndistributedFunds, transformChartData} from "@/lib/utils";
 import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
 import {AccountsDataContext} from "@/lib/context/AccountsDataContext";
+import {UserContext} from "@/lib/context/UserContext";
 
 
 export default function AccountsPage() {
@@ -27,6 +28,7 @@ export default function AccountsPage() {
         accountsList,
         setAccountsList,
     } = useContext(AccountsDataContext);
+    const { user } = useContext(UserContext);
     const [selectedView, setSelectedView] = useState<ViewKey>('3M'); // Default view
     const [isCreateAccountModalOpen, setIsCreateAccountModalOpen] = useState(false);
 
@@ -38,7 +40,7 @@ export default function AccountsPage() {
 
     const fetchDataFromDB = async () => {
         toast.success("Fetching data from database");
-        const savingsDataObj = await getSavingsData();
+        const savingsDataObj = await getSavingsData(user?.email);
         if (savingsDataObj) {
             const {
                 dailySavingsBalance: fetchedDailySavingsBalance,
@@ -50,7 +52,7 @@ export default function AccountsPage() {
             const lastSavingsAmount = lastElement.amount;
 
             const updatedUndistributedFunds = calculateUndistributedFunds(lastSavingsAmount, fetchedSavingsGoals);
-            addNewDayToSavingsBalance(fetchedDailySavingsBalance);
+            addNewDayToSavingsBalance(fetchedDailySavingsBalance, user?.email);
 
             setDailySavingsBalanceMasterData(fetchedDailySavingsBalance);
             setTotalSaved(lastSavingsAmount)

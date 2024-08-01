@@ -8,6 +8,7 @@ import PriorityGoalPicker from "@/components/common/PriorityGoalPicker";
 import toast from "react-hot-toast";
 import {AccountsDataContext} from "@/lib/context/AccountsDataContext";
 import SavingsAccountPicker from "@/components/common/SavingsAccountPicker";
+import {UserContext} from "@/lib/context/UserContext";
 
 export default function DepositModal() {
     const {isDepositModalOpen, setIsDepositModalOpen} = useContext(ModalOpenContext)
@@ -22,6 +23,7 @@ export default function DepositModal() {
         accountsList,
         setAccountsList
     } = useContext(AccountsDataContext);
+    const { user } = useContext(UserContext);
     const TODAY = new Date().toLocaleDateString();
     const [depositAmount, setDepositAmount] = useState(0);
     const [priorityGoal, setPriorityGoal] = useState("None");
@@ -68,7 +70,7 @@ export default function DepositModal() {
             dailySavingsBalance: newSavingsBalance,
             savingsGoals: updatedSavingsGoals
         };
-        updateSavingsDoc(newSavingsData)
+        updateSavingsDoc(user?.email, newSavingsData)
 
         setTotalSaved(newSavingsBalance[newSavingsBalance.length - 1].amount);
         setSavingsGoals(updatedSavingsGoals);

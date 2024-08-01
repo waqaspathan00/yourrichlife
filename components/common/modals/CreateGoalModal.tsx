@@ -6,6 +6,7 @@ import {ModalOpenContext} from "@/lib/context/ModalOpenContext";
 import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
 import EmojiPickerModal from "@/components/common/modals/EmojiPickerModal";
 import toast from "react-hot-toast";
+import {UserContext} from "@/lib/context/UserContext";
 
 export default function CreateGoalModal() {
     const {
@@ -14,6 +15,7 @@ export default function CreateGoalModal() {
         createGoalModalType,
         setIsEmojiPickerModalOpen
     } = useContext(ModalOpenContext);
+    const {user} = useContext(UserContext);
     const {savingsGoals, setSavingsGoals} = useContext(SavingsDataContext);
     const [name, setName] = useState("");
     const [amount, setAmount] = useState(0);
@@ -57,7 +59,7 @@ export default function CreateGoalModal() {
         const newSavingsData = {
             savingsGoals: newGoals
         };
-        updateSavingsDoc(newSavingsData)
+        updateSavingsDoc(user?.email, newSavingsData)
 
         // @ts-ignore
         setSavingsGoals(newGoals);

@@ -6,6 +6,7 @@ import {ModalOpenContext} from "@/lib/context/ModalOpenContext";
 import SavingsAccountPicker from "@/components/common/SavingsAccountPicker";
 import {AccountsDataContext} from "@/lib/context/AccountsDataContext";
 import toast from "react-hot-toast";
+import {UserContext} from "@/lib/context/UserContext";
 
 export default function WithdrawalModal() {
     const {
@@ -14,6 +15,7 @@ export default function WithdrawalModal() {
     const {
         accountsList,
     } = useContext(AccountsDataContext);
+    const { user } = useContext(UserContext);
     const {dailySavingsBalanceMasterData, totalSaved, setTotalSaved} = useContext(SavingsDataContext);
     const {isWithdrawalModalOpen, setIsWithdrawalModalOpen} = useContext(ModalOpenContext);
     const [withdrawalAmount, setWithdrawalAmount] = useState(0);
@@ -39,7 +41,7 @@ export default function WithdrawalModal() {
             dailySavingsBalance: newSavingsBalance
         };
 
-        updateSavingsDoc(newSavingsData)
+        updateSavingsDoc(user?.email, newSavingsData)
         setTotalSaved(newSavingsBalance[newSavingsBalance.length - 1].amount);
         setIsWithdrawalModalOpen(false);
     }
