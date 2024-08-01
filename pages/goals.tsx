@@ -17,6 +17,7 @@ import DistributeFundsModal from "@/components/common/modals/DistributeFundsModa
 import DisplayGoals from "@/components/DisplayGoals";
 import toast from "react-hot-toast";
 import {AccountsDataContext} from "@/lib/context/AccountsDataContext";
+import {UserContext} from "@/lib/context/UserContext";
 
 
 /**
@@ -36,7 +37,7 @@ import {AccountsDataContext} from "@/lib/context/AccountsDataContext";
  *
  * @constructor
  */
-export default function Home() {
+export default function GoalsPage() {
     const {
         dailySavingsBalanceMasterData,
         setDailySavingsBalanceMasterData,
@@ -49,6 +50,7 @@ export default function Home() {
     const {
         setAccountsList,
     } = useContext(AccountsDataContext);
+    const { user } = useContext(UserContext);
     const [selectedView, setSelectedView] = useState<ViewKey>('3M'); // Default view
 
     useEffect(() => {
@@ -59,7 +61,7 @@ export default function Home() {
 
     const fetchDataFromDB = async () => {
         toast.success("Fetching data from database");
-        const savingsDataObj = await getSavingsData();
+        const savingsDataObj = await getSavingsData(user?.email);
         if (savingsDataObj) {
             const {
                 dailySavingsBalance: fetchedDailySavingsBalance,
@@ -71,7 +73,7 @@ export default function Home() {
             const lastSavingsAmount = lastElement.amount;
 
             const updatedUndistributedFunds = calculateUndistributedFunds(lastSavingsAmount, fetchedSavingsGoals);
-            addNewDayToSavingsBalance(fetchedDailySavingsBalance);
+            addNewDayToSavingsBalance(fetchedDailySavingsBalance, user?.email);
 
             setDailySavingsBalanceMasterData(fetchedDailySavingsBalance);
             setTotalSaved(lastSavingsAmount)

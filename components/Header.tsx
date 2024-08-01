@@ -6,7 +6,7 @@ import {HiCurrencyDollar, HiOutlineCurrencyDollar} from "react-icons/hi2";
 import {IoCard, IoCardOutline, IoExit, IoExitOutline} from "react-icons/io5";
 import Link from "next/link";
 import {handleSignOut} from "@/lib/firebase";
-import {router} from "next/client";
+import {useRouter} from "next/router";
 
 
 export default function Header() {
@@ -29,6 +29,7 @@ export default function Header() {
 }
 
 const ProfileDropdown = () => {
+    const router = useRouter();
 
     return (
         <Menu as="div" className="relative z-10 inline-block text-left">
