@@ -2,12 +2,14 @@ import React, {useContext} from "react"
 import Modal from "@/components/common/modals/Modal";
 import {completeGoal} from "@/lib/firebase";
 import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
+import {UserContext} from "@/lib/context/UserContext";
 
 export default function CompleteGoalModal({goal, isCompleteGoalModalOpen, setIsCompleteGoalModalOpen}: any) {
+    const {user} = useContext(UserContext)
     const {savingsGoals, setSavingsGoals, completedGoals, setCompletedGoals} = useContext(SavingsDataContext);
 
     const handleCompleteGoal = async () => {
-        const {savingsGoals: updatedSavingsGoals, completedGoals: updatedCompletedGoals} = await completeGoal(savingsGoals, completedGoals, goal.id);
+        const {savingsGoals: updatedSavingsGoals, completedGoals: updatedCompletedGoals} = await completeGoal(savingsGoals, completedGoals, goal.id, user?.email);
 
         setSavingsGoals(updatedSavingsGoals);
         setCompletedGoals(updatedCompletedGoals);

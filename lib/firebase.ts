@@ -114,8 +114,7 @@ export const completeGoal = async (savingsGoals: Goal[], completedGoals: Goal[],
     return {savingsGoals: newSavingsGoals, completedGoals: newCompletedGoals};
 }
 
-export const deleteGoal = async (goals: Goal[], id: number, type: string, userEmail: string | null | undefined) => {
-    if (!userEmail) return
+export const deleteGoal = async (goals: Goal[], id: number, type: string, userEmail: string) => {
     const typeKey = type === "completed" ? "completedGoals" : "savingsGoals";
     const newGoals = goals.filter((goal: Goal) => goal.id !== id);
     await updateSavingsDoc(userEmail, {[typeKey]: newGoals});
