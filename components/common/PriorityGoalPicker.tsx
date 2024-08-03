@@ -16,7 +16,7 @@ export default function PriorityGoalPicker({
                                            }: PriorityGoalPickerProps) {
     return (
         <Listbox value={priorityGoal} onChange={handleChangePriorityGoal}>
-            <div className="z-50">
+            <div className="z-20">
                 <Listbox.Button
                     className="relative w-full cursor-pointer rounded-lg border-2 bg-white py-2 pl-3 pr-10 text-left ">
                     <span className="block truncate">{priorityGoal}</span>

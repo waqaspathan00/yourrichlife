@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import {AccountsDataContext} from "@/lib/context/AccountsDataContext";
 import SavingsAccountPicker from "@/components/common/SavingsAccountPicker";
 import {UserContext} from "@/lib/context/UserContext";
+import DatePickerTailwind from "@/components/common/DatePicker";
 
 export default function DepositModal() {
     const {isDepositModalOpen, setIsDepositModalOpen} = useContext(ModalOpenContext)
@@ -26,6 +27,7 @@ export default function DepositModal() {
     const { user } = useContext(UserContext);
     const TODAY = new Date().toLocaleDateString();
     const [depositAmount, setDepositAmount] = useState(0);
+    const [savingsDate, setSavingsDate] = useState(TODAY);
     const [priorityGoal, setPriorityGoal] = useState("None");
     const [percentageInt, setPercentageInt] = useState(0);
     const [accountName, setAccountName] = useState("None");
@@ -44,10 +46,21 @@ export default function DepositModal() {
         }
 
         const newSavingsBalance = [...dailySavingsBalanceMasterData];
+        const savingsDateObj = new Date(savingsDate);
+        const existingEntry = newSavingsBalance.find(entry => new Date(entry.date).toLocaleDateString("en-US") === savingsDateObj.toLocaleDateString("en-US"));
+
+        if (existingEntry) {
+            existingEntry.amount += depositAmount;
+        } else {
+            newSavingsBalance.push({
+                date: savingsDate,
+                amount: depositAmount
+            });
+        }
+
         const lastElement = newSavingsBalance[newSavingsBalance.length - 1];
         const lastSavingsAmount = lastElement.amount;
         const updatedTotalSavings = lastSavingsAmount + depositAmount;
-        newSavingsBalance[newSavingsBalance.length - 1].amount = updatedTotalSavings;
 
         const {
             remainingFundsToDistribute,
@@ -115,8 +128,9 @@ export default function DepositModal() {
         <Modal isModalOpen={isDepositModalOpen} setIsModalOpen={setIsDepositModalOpen}>
             <h2 className={"text-center text-xl font-bold"}>Deposit Savings</h2>
             <div className={"space-y-4"}>
-                {/*<DatePickerTailwind savingsDate={savingsDate} setSavingsDate={setSavingsDate}/>*/}
-
+                <div className={"z-30"}>
+                    <DatePickerTailwind savingsDate={savingsDate} setSavingsDate={setSavingsDate}/>
+                </div>
                 <div className={"flex flex-col"}>
                     <label htmlFor="amount">
                         Amount
