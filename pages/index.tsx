@@ -41,7 +41,7 @@ export default function LandingSignInPage() {
             const user = userCredential.user;
             updateProfile(user, { displayName: name });
             createUserDoc(email);
-            toast.success(`Welcome ${name}`);
+            // toast.success(`Welcome ${name}`);
             await router.push("/goals");
         } catch (error) {
             console.log(error);

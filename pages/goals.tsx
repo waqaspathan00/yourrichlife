@@ -55,12 +55,13 @@ export default function GoalsPage() {
 
     useEffect(() => {
         if (!dailySavingsBalanceMasterData.length) {
+            const toastId = toast.loading("Getting your data");
             fetchDataFromDB();
+            toast.dismiss(toastId);
         }
     }, [])
 
     const fetchDataFromDB = async () => {
-        toast.success("Fetching data from database");
         const savingsDataObj = await getSavingsData(user?.email);
         if (savingsDataObj) {
             const {

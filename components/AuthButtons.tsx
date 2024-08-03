@@ -15,7 +15,7 @@ export const ContinueWithGoogleButton = ({ router }: AuthButtonProps) => {
     const signInWithGoogle = async () => {
         signInWithPopup(auth, googleAuthProvider).then((data) => {
             createUserDoc(data.user?.email);
-            toast.success(`Welcome ${data.user?.displayName}`);
+            // toast.success(`Welcome ${data.user?.displayName}`);
         });
         router.push("/");
     };

@@ -31,7 +31,7 @@ export default function SignInPage() {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             // Signed in
             const user = userCredential.user;
-            toast.success(`Welcome ${user?.displayName}`);
+            // toast.success(`Welcome ${user?.displayName}`);
             router.push("/");
         } catch (error: AuthError | any) {
             switch (error.code) {
