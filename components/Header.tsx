@@ -1,12 +1,12 @@
-import React, {useState, useEffect, useContext, Fragment} from "react"
+import React, {Fragment, useContext} from "react"
 import {SavingsDataContext} from "@/lib/context/SavingsDataContext";
-import {IoIosArrowDown} from "react-icons/io";
 import {Menu, Transition} from "@headlessui/react";
 import {HiCurrencyDollar, HiOutlineCurrencyDollar} from "react-icons/hi2";
-import {IoCard, IoCardOutline, IoExit, IoExitOutline} from "react-icons/io5";
+import {IoCard, IoCardOutline, IoExit, IoExitOutline, IoMenu} from "react-icons/io5";
 import Link from "next/link";
 import {handleSignOut} from "@/lib/firebase";
 import {useRouter} from "next/router";
+import {UserContext} from "@/lib/context/UserContext";
 
 
 export default function Header() {
@@ -29,15 +29,19 @@ export default function Header() {
 }
 
 const ProfileDropdown = () => {
+    const {user} = useContext(UserContext);
     const router = useRouter();
 
     return (
         <Menu as="div" className="relative z-10 inline-block text-left">
+            {/*<Menu.Button className="inline-flex w-full items-center justify-center text-lg text-blue">*/}
+            {/*    <IoIosArrowDown size={20} className={"mr-2 text-white"}/>*/}
+            {/*    <div className={"border-2 p-1 rounded-full"}>*/}
+            {/*        <img className={"rounded-full w-20 h-20"} src={"/img/lovely-couple.png"}/>*/}
+            {/*    </div>*/}
+            {/*</Menu.Button>*/}
             <Menu.Button className="inline-flex w-full items-center justify-center text-lg text-blue">
-                <IoIosArrowDown size={20} className={"mr-2 text-white"}/>
-                <div className={"border-2 p-1 rounded-full"}>
-                    <img className={"rounded-full w-20 h-20"} src={"/img/lovely-couple.png"}/>
-                </div>
+                <IoMenu size={32} className={"mr-2 text-white"}/>
             </Menu.Button>
 
             <Transition
@@ -51,6 +55,11 @@ const ProfileDropdown = () => {
             >
                 <Menu.Items
                     className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 overflow-hidden rounded-md bg-white shadow-lg ring-1 ring-black/5">
+                    <Menu.Item>
+                        <div className={"px-2 py-2"}>
+                            <p>Hey, {user?.displayName}</p>
+                        </div>
+                    </Menu.Item>
                     <Menu.Item>
                         {({active, close}: any) => (
                             <Link
@@ -105,11 +114,12 @@ const ProfileDropdown = () => {
                             <Link
                                 className={`${
                                     active ? "bg-blue-100" : "text-gray-900"
-                                } flex items-center px-2 py-2`}
+                                } flex justify-center-center px-2 py-2`}
                                 href={"https://www.buymeacoffee.com/yourrichlife"}
                                 onClick={close}
                             >
-                                <img src={"/img/bmc-button.png"} />
+                                {/*<img className={"w-44 "} alt={"Buy me a coffee ->"} src={"/img/bmc-button.png"} />*/}
+                                <img className={"w-36 "} alt={"Buy me a coffee ->"} src={"/img/bmc-no-background.png"} />
                             </Link>
                         )}
                     </Menu.Item>
