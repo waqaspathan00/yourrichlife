@@ -10,7 +10,6 @@ interface StepLineChartProps {
 }
 
 const StepLineChart = ({view}: StepLineChartProps) => {
-    // test if this works on mobile or not
     const chartRef = useRef<HTMLDivElement>(null);
     const {dailySavingsBalanceChartData} = useContext(SavingsDataContext);
     const dailyAmounts = dailySavingsBalanceChartData.map((day) => day.amount);

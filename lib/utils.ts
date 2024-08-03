@@ -1547,26 +1547,31 @@ export const distributeFundsToGoals = (amountToDistribute: number, percentage: n
  */
 export const addNewDayToSavingsBalance = (fetchedDailySavingsBalance: DailySavingsBalance[], userEmail: string | null | undefined) => {
     const lastElement = fetchedDailySavingsBalance[fetchedDailySavingsBalance.length - 1];
-    const lastSavingsDate = lastElement.date;
+    const lastSavingsDate = new Date(lastElement.date);
     const lastSavingsAmount = lastElement.amount;
-    const dateLastSignedIn = localStorage.getItem("dateLastSignedIn");
+    const TODAY = new Date()
 
-    const TODAY = new Date().toLocaleDateString();
-    if (!dateLastSignedIn || dateLastSignedIn !== TODAY || lastSavingsDate !== TODAY) {
-        // toast.success(`adding a new day", "dateLastSignedIn", ${dateLastSignedIn}, "TODAY", ${TODAY}`)
-        const newElement = {
-            date: TODAY,
-            amount: lastSavingsAmount
+    if (lastSavingsDate.toDateString() !== TODAY.toDateString()) {
+        const differenceInMilliseconds = TODAY.getTime() - lastSavingsDate.getTime();
+        const daysDifference = Math.floor((differenceInMilliseconds) / (1000 * 60 * 60 * 24));
+
+        for (let i = 1; i <= daysDifference; i++) {
+            const newDate = new Date(lastSavingsDate);
+            newDate.setDate(newDate.getDate() + i);
+            const newDateString = newDate.toLocaleDateString();
+
+            const newElement = {
+                date: newDateString,
+                amount: lastSavingsAmount
+            };
+            fetchedDailySavingsBalance.push(newElement);
         }
-        fetchedDailySavingsBalance.push(newElement);
 
         if (fetchedDailySavingsBalance.length > 365) {
             fetchedDailySavingsBalance.shift();
         }
         updateSavingsDoc(userEmail, {dailySavingsBalance: fetchedDailySavingsBalance})
     }
-
-    localStorage.setItem("dateLastSignedIn", TODAY);
 }
 
 export function updateGoals<T extends keyof Goal>(savingsGoals: Goal[], goalId: number, key: T, value: Goal[T]): Goal[] {
