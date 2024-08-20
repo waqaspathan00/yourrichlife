@@ -59,7 +59,7 @@ export default function GoalsPage() {
             fetchDataFromDB();
             toast.dismiss(toastId);
         }
-    }, [])
+    }, [user])
 
     const fetchDataFromDB = async () => {
         const savingsDataObj = await getSavingsData(user?.email);
