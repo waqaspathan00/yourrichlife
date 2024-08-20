@@ -1,40 +1,105 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# YourRichLife
+
+## Table of Contents
+
+1. [Features](#features)
+2. [Getting Started](#getting-started)
+   - [Prerequisites](#prerequisites)
+   - [Installation](#installation)
+3. [Firebase Configuration](#firebase-configuration)
+   - [Create a Firebase Project](#create-a-firebase-project)
+   - [Add a Web App to Your Project](#add-a-web-app-to-your-project)
+   - [Retrieve Your Firebase Config](#retrieve-your-firebase-config)
+   - [Create environment variables](#create-environment-variables)
+   - [Run the Application](#run-the-application)
+4. [Contributing](#contributing)
+5. [License](#license)
+
+## Features
+
+- **Goal Setting**: Create specific financial goals and track your progress.
+- **Progress Tracking**: Visualize your savings journey and stay motivated.
+- **User-Friendly Interface**: Simple and intuitive design for easy goal management.
+- **Free Access**: Enjoy all features for free until the official release of Copilot Money's savings goal feature.
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Before you can run the project locally, ensure you have the following installed:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Node.js (version 14 or higher)
+- npm (version 6 or higher)
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+### Installation
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+1. **Clone the repository:**
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+   ```bash
+   git clone https://github.com/waqaspathan00/yourrichlife.git
+   cd yourrichlife
+   ```
+   
+2. **Install dependencies:**
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+    ```bash
+    npm install
+    ```
 
-## Learn More
+3. **Add Firebase configuration:**
 
-To learn more about Next.js, take a look at the following resources:
+    To run the application, you need to configure Firebase. Follow the steps below to get your Firebase configuration JSON settings.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Firebase Configuration
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+### Create a Firebase Project
 
-## Deploy on Vercel
+- Go to the [Firebase Console](https://console.firebase.google.com/).
+- Click on "Add Project" and follow the setup wizard.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Add a Web App to Your Project
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- After creating the project, select the project you just created.
+- Click on the gear icon next to "Project Overview" and choose "Project settings."
+- In the "General" tab, scroll down to "Your apps" and click on the web icon `</>` to add a new web app.
+- Register your app by providing a name and clicking "Register app."
+
+### Retrieve Your Firebase Config
+
+- Once your app is registered, Firebase will provide a configuration object that looks like this:
+
+   ```json
+   {
+       apiKey: "YOUR_API_KEY",
+       authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+       projectId: "YOUR_PROJECT_ID",
+       storageBucket: "YOUR_PROJECT_ID.appspot.com",
+       messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+       appId: "YOUR_APP_ID",
+       measurementId: "YOUR_MEASUREMENT_ID"
+   }
+  ```
+- Copy this configuration object.  
+
+### Create environment variables
+
+- Create a `.env.local` file in the root directory of the project.
+- Add the following environment variables to the file:
+
+   ```bash
+    NEXT_PUBLIC_FIREBASE_CONFIG='PASTE_FIREBASE_CONFIG_OBJ_HERE'
+   ```
+
+### Run the Application
+
+   ```bash
+   npm run dev
+   ```
+
+You can locally view YourRichLife at http://localhost:3000. 
+
+Or publicly at https://yourrichlife.vercel.app.
+
+We welcome contributions! Please feel free to submit a pull request or open an issue.
+
+This project is licensed under the MIT License. See the LICENSE file for more details.
